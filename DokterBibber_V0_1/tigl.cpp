@@ -1,5 +1,4 @@
 #include "tigl.h"
-#include "tigl.h"
 
 #include <glm/gtc/type_ptr.hpp>
 #include <string>
@@ -165,7 +164,7 @@ namespace tigl
 		addShader(this->programId, GL_VERTEX_SHADER, R"ESC(#version 330
 
 layout (location = 0) in vec3 a_position;
-layout (location = 1) in vec4 a_color;
+layout (location = 1) in vec3 a_color;
 layout (location = 2) in vec2 a_texcoord;
 layout (location = 3) in vec3 a_normal;
 
@@ -174,7 +173,7 @@ uniform mat4 viewMatrix = mat4(1.0);
 uniform mat4 projectionMatrix = mat4(1.0);
 uniform mat3 normalMatrix = mat3(1.0);
 
-out vec4 color;
+out vec3 color;
 out vec2 texCoord;
 out vec3 normal;
 out vec3 position;
@@ -292,20 +291,6 @@ void main()
 }
 )ESC");
 		glLinkProgram(programId);
-
-		GLint status;
-		glGetProgramiv(programId, GL_COMPILE_STATUS, &status);
-		if (status == GL_FALSE)
-		{
-			int length, charsWritten;
-			glGetProgramiv(programId, GL_INFO_LOG_LENGTH, &length);
-			char* infolog = new char[length + 1];
-			memset(infolog, 0, length + 1);
-			glGetProgramInfoLog(programId, length, &charsWritten, infolog);
-			std::cout << "Error compiling shader:\n" << infolog << std::endl;
-			delete[] infolog;
-			return;
-		}
 
 		uniforms[Uniform::ModelMatrix] = glGetUniformLocation(programId, "modelMatrix");
 		uniforms[Uniform::ViewMatrix] = glGetUniformLocation(programId, "viewMatrix");
