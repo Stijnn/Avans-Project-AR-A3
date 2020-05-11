@@ -1,3 +1,4 @@
+#define STB_IMAGE_IMPLEMENTATION
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include "tigl.h"
@@ -8,11 +9,14 @@
 
 using tigl::Vertex;
 
+#include "stb_image.h" 
+
 #pragma comment(lib, "glfw3.lib")
 #pragma comment(lib, "glew32s.lib")
 #pragma comment(lib, "opengl32.lib")
 
 GLFWwindow* window;
+GLuint textureId = -1;
 
 void init();
 void update();
@@ -79,7 +83,7 @@ void draw()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     
     glm::mat4 projection = glm::perspective(55.0f, width / (float)height, 0.1f, 100.0f);
-    glm::mat4 view = glm::lookAt(glm::vec3(0, 5, 0), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
+    glm::mat4 view = glm::lookAt(glm::vec3(0, 10.0f, 0), glm::vec3(0, 0, 0), glm::vec3(0, 1, -1.0f));
     
 
     tigl::shader->setProjectionMatrix(projection);
@@ -99,10 +103,10 @@ void cubes() {
         tigl::shader->setModelMatrix(model);
 
         tigl::begin(GL_QUADS);
-        tigl::addVertex(Vertex::PC(glm::vec3(-1, -1, 1), glm::vec4(1, -1, 1, 1)));
-        tigl::addVertex(Vertex::PC(glm::vec3(1, -1, 1), glm::vec4(1, 1, 1, 1)));
-        tigl::addVertex(Vertex::PC(glm::vec3(1, 1, 1), glm::vec4(-1, 1, 1, 1)));
-        tigl::addVertex(Vertex::PC(glm::vec3(-1, 1, 1), glm::vec4(-1, -1, 1, 1)));
+        tigl::addVertex(Vertex::PC(glm::vec3(-5, 1, -5), glm::vec4(-5, 1, 5, 1)));
+        tigl::addVertex(Vertex::PC(glm::vec3(-5, 1, 5), glm::vec4(5, 1, 5, 1)));
+        tigl::addVertex(Vertex::PC(glm::vec3(5, 1, 5), glm::vec4(5, 1, -5, 1)));
+        tigl::addVertex(Vertex::PC(glm::vec3(5, 1, -5), glm::vec4(-5, 1, -5, 1)));
 
         tigl::end();
 }
