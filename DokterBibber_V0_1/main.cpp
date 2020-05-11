@@ -99,6 +99,7 @@ void cubes() {
         tigl::shader->setModelMatrix(model);
 
         tigl::begin(GL_QUADS);
+
         tigl::addVertex(Vertex::PC(glm::vec3(-1, -1, 1), glm::vec4(1, -1, 1, 1)));
         tigl::addVertex(Vertex::PC(glm::vec3(1, -1, 1), glm::vec4(1, 1, 1, 1)));
         tigl::addVertex(Vertex::PC(glm::vec3(1, 1, 1), glm::vec4(-1, 1, 1, 1)));
