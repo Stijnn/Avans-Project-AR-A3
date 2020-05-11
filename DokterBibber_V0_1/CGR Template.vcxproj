@@ -158,9 +158,15 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="MeshComponent.cpp" />
     <ClCompile Include="tigl.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Component.h" />
+    <ClInclude Include="IDrawableComponent.h" />
+    <ClInclude Include="IInitializableComponent.h" />
+    <ClInclude Include="IUpdatableComponent.h" />
+    <ClInclude Include="MeshComponent.h" />
     <ClInclude Include="stb_image.h" />
     <ClInclude Include="tigl.h" />
   </ItemGroup>

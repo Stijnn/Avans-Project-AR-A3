@@ -7,6 +7,8 @@
 #include "opencv2/imgproc/imgproc.hpp" 
 #include "opencv2/highgui/highgui.hpp"
 
+#include "MeshComponent.h"
+
 using tigl::Vertex;
 
 #include "stb_image.h" 
@@ -15,6 +17,7 @@ using tigl::Vertex;
 #pragma comment(lib, "glew32s.lib")
 #pragma comment(lib, "opengl32.lib")
 
+MeshComponent* meshComponent;
 GLFWwindow* window;
 GLuint textureId = -1;
 
@@ -27,7 +30,9 @@ int main(void)
 {
     if (!glfwInit())
         throw "Could not initialize glwf";
+
     window = glfwCreateWindow(1920, 1090, "Dokter Bibber!", NULL, NULL);
+
     if (!window)
     {
         glfwTerminate();
@@ -63,9 +68,9 @@ void init()
     });
 
     glEnable(GL_DEPTH_TEST);
-}
 
-float angle = 0.0f;
+	meshComponent = Component::Instantiate<MeshComponent>();
+}
 
 void update()
 {
@@ -96,17 +101,17 @@ void draw()
 }
 
 void cubes() {  
-        glm::mat4 model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(1, 0, 0));
-        model = glm::rotate(model, angle, glm::vec3(1, 1, 0));
+    glm::mat4 model = glm::mat4(1.0f);
+    model = glm::translate(model, glm::vec3(1, 0, 0));
+    model = glm::rotate(model, 0.f, glm::vec3(1, 1, 0));
 
-        tigl::shader->setModelMatrix(model);
+    tigl::shader->setModelMatrix(model);
 
-        tigl::begin(GL_QUADS);
-        tigl::addVertex(Vertex::PC(glm::vec3(-5, 1, -5), glm::vec4(-5, 1, 5, 1)));
-        tigl::addVertex(Vertex::PC(glm::vec3(-5, 1, 5), glm::vec4(5, 1, 5, 1)));
-        tigl::addVertex(Vertex::PC(glm::vec3(5, 1, 5), glm::vec4(5, 1, -5, 1)));
-        tigl::addVertex(Vertex::PC(glm::vec3(5, 1, -5), glm::vec4(-5, 1, -5, 1)));
+    tigl::begin(GL_QUADS);
+    tigl::addVertex(Vertex::PC(glm::vec3(-5, 1, -5), glm::vec4(-5, 1, 5, 1)));
+    tigl::addVertex(Vertex::PC(glm::vec3(-5, 1, 5), glm::vec4(5, 1, 5, 1)));
+    tigl::addVertex(Vertex::PC(glm::vec3(5, 1, 5), glm::vec4(5, 1, -5, 1)));
+    tigl::addVertex(Vertex::PC(glm::vec3(5, 1, -5), glm::vec4(-5, 1, -5, 1)));
 
-        tigl::end();
+    tigl::end();
 }
