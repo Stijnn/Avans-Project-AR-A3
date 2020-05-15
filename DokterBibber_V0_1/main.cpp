@@ -5,6 +5,9 @@
 #include <opencv2/opencv.hpp>
 #include "opencv2/imgproc/imgproc.hpp" 
 #include "opencv2/highgui/highgui.hpp"
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 #include "MeshComponent.h"
 
@@ -68,9 +71,17 @@ void init()
 
     glEnable(GL_DEPTH_TEST);
 
-	std::vector<Vertex> pinguinModel = ObjModel::load("E:\\Avans\\Proftaak AR\\DokterBibber_V0_1\\x64\\Debug\\PingquinBibber.obj");
+    //Loads model from file Pinguin
+	//std::vector<Vertex> pinguinModel = ObjModel::load("E:\\Avans\\Proftaak AR\\DokterBibber_V0_1\\x64\\Debug\\PingquinBibber.obj");
+    std::vector<Vertex> pinguinModel = ObjModel::load("D:\\Projects\\Avans-Project-AR-A3\\PingquinBibberV1.obj");
 	meshComponent = Component::Instantiate<MeshComponent>(&pinguinModel);
 	meshComponent->SetScale(0.5f);
+
+    //Loads model from file Pincet
+    std::vector<Vertex> pincetModel = ObjModel::load("D:\\Projects\\Avans-Project-AR-A3\\PincetV1.obj");
+    meshComponent = Component::Instantiate<MeshComponent>(&pincetModel);
+    
+    
 }
 
 void update()
