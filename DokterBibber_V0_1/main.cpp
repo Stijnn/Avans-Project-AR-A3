@@ -142,18 +142,18 @@ void draw()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // timer
-	std::stringstream buffer;
-	int seconds, hours, minutes;
-	seconds = duration;
-	minutes = seconds / 60;
-	hours = minutes / 60;
-	buffer << int(hours) << ":" << int(minutes % 60)
-		<< ":" << int(seconds % 60);
+    std::stringstream buffer;
+    int seconds, hours, minutes;
+    seconds = duration;
+    minutes = seconds / 60;
+    hours = minutes / 60;
+    buffer << int(hours) << ":" << int(minutes % 60)
+        << ":" << int(seconds % 60);
 
     textWriter->setScale(1.4f);
     textWriter->drawText(buffer.str(), 0, -800);
     std::string coordsXY("X: " + std::to_string(-mouse->getMouseXPos() * (sensivityScaler)) + ", coord Y: " + std::to_string(-mouse->getMouseYPos() * (sensivityScaler)));
-    
+
     // coord text
     textWriter->setScale(1.1f);
     textWriter->drawText(coordsXY, -2020, -1080);
@@ -161,22 +161,22 @@ void draw()
 
     // pincet movement
     meshComponentPincet->SetPosition(glm::vec3(-mouse->getMouseXPos() * (sensivityScaler), 0, -mouse->getMouseYPos() * (sensivityScaler)));
-    
+
     glm::mat4 projection = glm::perspective(55.0f, width / (float)height, 0.1f, 100.0f);
     glm::mat4 view = glm::lookAt(glm::vec3(0, 10.0f, 0), glm::vec3(0, 0, 0), glm::vec3(0, 1, -1.0f));
-    
+
     tigl::shader->setProjectionMatrix(projection);
     tigl::shader->setViewMatrix(view);
-    
-	tigl::shader->enableTexture(true);
+
+    tigl::shader->enableTexture(true);
     tigl::shader->enableColor(true);
-        
+
+    glBindTexture(GL_TEXTURE_2D, textureId);
+
     showCameraScreen();
 
-	meshComponent->Draw(0);
+    meshComponent->Draw(0);
     meshComponentPincet->Draw(0);
-
-    
 }
 
 void cubes() {  
