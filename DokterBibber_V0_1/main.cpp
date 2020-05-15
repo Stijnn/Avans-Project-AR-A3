@@ -1,4 +1,3 @@
-#define STB_IMAGE_IMPLEMENTATION
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include "tigl.h"
@@ -69,12 +68,13 @@ void init()
 
     glEnable(GL_DEPTH_TEST);
 
-	meshComponent = Component::Instantiate<MeshComponent>();
+	std::vector<Vertex> pinguinModel = ObjModel::load("E:\\Avans\\Proftaak AR\\DokterBibber_V0_1\\x64\\Debug\\PingquinBibber.obj");
+	meshComponent = Component::Instantiate<MeshComponent>(&pinguinModel);
 }
 
 void update()
 {
-
+	meshComponent->Update(0);
 }
 
 void draw()
@@ -90,14 +90,13 @@ void draw()
     glm::mat4 projection = glm::perspective(55.0f, width / (float)height, 0.1f, 100.0f);
     glm::mat4 view = glm::lookAt(glm::vec3(0, 10.0f, 0), glm::vec3(0, 0, 0), glm::vec3(0, 1, -1.0f));
     
-
     tigl::shader->setProjectionMatrix(projection);
     tigl::shader->setViewMatrix(view);
     
-
+	tigl::shader->enableTexture(true);
     tigl::shader->enableColor(true);
         
-    cubes();
+	meshComponent->Draw(0);
 }
 
 void cubes() {  

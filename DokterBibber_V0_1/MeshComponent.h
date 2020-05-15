@@ -7,6 +7,8 @@
 
 #include "Component.h"
 #include <vector>
+#include <glm/gtc/matrix_transform.hpp>
+#include "ObjModel.h"
 #include "tigl.h"
 
 class MeshComponent 
@@ -24,6 +26,7 @@ public:
 	
 private:
 	std::vector<tigl::Vertex> m_Vertices;
+	ObjModel* m_ObjectModel;
 };
 
 #endif
