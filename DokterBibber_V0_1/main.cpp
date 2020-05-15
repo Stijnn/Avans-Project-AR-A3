@@ -27,6 +27,9 @@ using tigl::Vertex;
 MeshComponent* meshComponent;
 MeshComponent* meshComponentPincet;
 
+cv::VideoCapture cap(1);
+cv::Mat frame;
+
 GLFWwindow* window;
 GLuint textureId = -1;
 double duration;
@@ -41,6 +44,10 @@ void init();
 void update();
 void draw();
 void cubes();
+
+bool initCam();
+void BindCVMat2GLTexture(cv::Mat& image);
+void showCameraScreen();
 
 int main(void)
 {
@@ -58,10 +65,18 @@ int main(void)
 
     tigl::init();
 
+    bool cameraAvailable = initCam();
     init();
+    
 
 	while (!glfwWindowShouldClose(window))
 	{
+        if (cameraAvailable) {
+            cap.read(frame);
+            cv::flip(frame, frame, 3);
+            BindCVMat2GLTexture(frame);
+        }
+
 		update();
 		draw();
 		glfwSwapBuffers(window);
@@ -93,14 +108,14 @@ void init()
 
     //Loads model from file Pinguin
 	//std::vector<Vertex> pinguinModel = ObjModel::load("E:\\Avans\\Proftaak AR\\DokterBibber_V0_1\\x64\\Debug\\PingquinBibber.obj");
-    //std::vector<Vertex> pinguinModel = ObjModel::load("D:\\Projects\\Avans-Project-AR-A3\\PingquinBibberV1.obj");
-    std::vector<Vertex> pinguinModel = ObjModel::load("C:\\Users\\finni\\Documents\\Programming\\Project-Objects\\PingquinBibberV1.obj");
+    std::vector<Vertex> pinguinModel = ObjModel::load("D:\\Avans\\Leerjaar 2\\Periode 4\\Project\\Avans-Project-AR-A3\\PingquinBibberV1.obj");
+    //std::vector<Vertex> pinguinModel = ObjModel::load("C:\\Users\\finni\\Documents\\Programming\\Project-Objects\\PingquinBibberV1.obj");
 	meshComponent = Component::Instantiate<MeshComponent>(&pinguinModel);
 	meshComponent->SetScale(1.0f);
 
     //Loads model from file Pincet
-    //std::vector<Vertex> pincetModel = ObjModel::load("D:\\Projects\\Avans-Project-AR-A3\\PincetV1.obj");
-    std::vector<Vertex> pincetModel = ObjModel::load("C:\\Users\\finni\\Documents\\Programming\\Project-Objects\\PincetV1.obj");
+    std::vector<Vertex> pincetModel = ObjModel::load("D:\\Avans\\Leerjaar 2\\Periode 4\\Project\\Avans-Project-AR-A3\\PincetV1.obj");
+    //std::vector<Vertex> pincetModel = ObjModel::load("C:\\Users\\finni\\Documents\\Programming\\Project-Objects\\PincetV1.obj");
     meshComponentPincet = Component::Instantiate<MeshComponent>(&pincetModel);
     meshComponentPincet->SetScale(0.2f);
 
@@ -156,8 +171,12 @@ void draw()
 	tigl::shader->enableTexture(true);
     tigl::shader->enableColor(true);
         
+    showCameraScreen();
+
 	meshComponent->Draw(0);
     meshComponentPincet->Draw(0);
+
+    
 }
 
 void cubes() {  
@@ -174,4 +193,46 @@ void cubes() {
     tigl::addVertex(Vertex::PC(glm::vec3(5, 1, -5), glm::vec4(-5, 1, -5, 1)));
 
     tigl::end();
+}
+
+bool initCam()
+{
+    // Controle of de camera wordt herkend.
+    if (!cap.isOpened())
+    {
+        std::cout << "Cannot open the video cam" << std::endl;
+        return false;
+    }
+    return true;
+}
+
+void showCameraScreen() {
+    tigl::begin(GL_QUADS);
+
+    tigl::addVertex(Vertex::PT(glm::vec3(-17, 0, 2), glm::vec2(0, 0)));
+    tigl::addVertex(Vertex::PT(glm::vec3(-17, 0, -8), glm::vec2(0, 1)));
+    tigl::addVertex(Vertex::PT(glm::vec3(-8, 0, -8), glm::vec2(1, 1)));
+    tigl::addVertex(Vertex::PT(glm::vec3(-8, 0, 2), glm::vec2(1, 0)));
+
+    tigl::end();
+}
+
+
+void BindCVMat2GLTexture(cv::Mat& image)
+{
+    glGenTextures(1, &textureId);
+    glBindTexture(GL_TEXTURE_2D, textureId);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    glTexImage2D(GL_TEXTURE_2D,
+        0,
+        GL_RGB,
+        image.cols,
+        image.rows,
+        0,
+        GL_RGB,
+        GL_UNSIGNED_BYTE,
+        image.ptr());
 }
