@@ -70,6 +70,7 @@ void init()
 
 	std::vector<Vertex> pinguinModel = ObjModel::load("E:\\Avans\\Proftaak AR\\DokterBibber_V0_1\\x64\\Debug\\PingquinBibber.obj");
 	meshComponent = Component::Instantiate<MeshComponent>(&pinguinModel);
+	meshComponent->SetScale(0.5f);
 }
 
 void update()

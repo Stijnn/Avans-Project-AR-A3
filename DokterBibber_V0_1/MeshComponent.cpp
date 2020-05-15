@@ -15,6 +15,7 @@ void MeshComponent::Draw(float a_DeltaTime)
 	glm::mat4 modelMatrix(1);
 	modelMatrix = glm::translate(modelMatrix, glm::vec3(0,0,0));
 	modelMatrix = glm::rotate(modelMatrix, glm::radians(180.f), glm::vec3(0, 1, 0));
+	modelMatrix = glm::scale(modelMatrix, glm::vec3(m_Scale, m_Scale, m_Scale));
 
 	tigl::shader->setModelMatrix(modelMatrix);
 
@@ -22,5 +23,4 @@ void MeshComponent::Draw(float a_DeltaTime)
 	for (auto& vert : m_Vertices)
 		tigl::addVertex(vert);
 	tigl::end();
-	//m_ObjectModel->draw();
 }

@@ -25,10 +25,17 @@ public:
 	virtual void Initialize	(void*)				override;
 	virtual void Update		(float a_DeltaTime) override;
 	virtual void Draw		(float a_DeltaTime) override;
+
+protected:
+	float m_Scale = 1.0f;
 	
 private:
 	std::vector<tigl::Vertex> m_Vertices;
 	ObjModel* m_ObjectModel;
+
+public:
+	inline float	GetScale ()					{ return m_Scale; }
+	inline void		SetScale (float a_Scale)	{ m_Scale = a_Scale; }
 };
 
 #endif
