@@ -157,6 +157,15 @@ void update()
     //}
 
     duration = (std::clock() - start) / (double)CLOCKS_PER_SEC;
+
+    //Check collision {
+        //If collision -> Game.AddStrike();
+    //}
+
+    //If(Game.IsGameOver()) {
+        //If game is done, do something.
+        //To Reset, use Game.StartNewGame();
+    //}
 }
 
 void draw()
