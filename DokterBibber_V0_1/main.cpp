@@ -10,6 +10,7 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <sstream>  
 
+#include "GameObject.h"
 #include "MeshComponent.h"
 #include "CollisionDetectionComponent.h"
 
@@ -120,10 +121,11 @@ void init()
 	/// </summary>
 	
 	GameObject* pinguinObj = (*g_ptrMainScene->GetRootObject())["Pinguin"]; // Verkrijgen van het opgeslagen gameobject
-	pinguinObj->AddComponent((Component*)(Component::Instantiate<MeshComponent>(&ObjModel::load("Data/Models/Pinguin/PinguinBibber.obj")))); // Het Toevoegen van een meshcomponent met data
+    MeshComponent* c = Component::Instantiate<MeshComponent>(&ObjModel::load("Data/Models/Pinguin/PinguinBibber.obj"));
+	pinguinObj->AddComponent((Component*)c); // Het Toevoegen van een meshcomponent met data
 
     colDectPenguin = Component::Instantiate<CollisionDetectionComponent>(); // Het aanmaken van een collision component
-    colDectPenguin->initializeCollisionFrame(pinguinObj->GetComponent<MeshComponent>()->GetVertices()); // Het overgeven van de mesh data
+    colDectPenguin->initializeCollisionFrame(c->GetVertices()); // Het overgeven van de mesh data
 	pinguinObj->AddComponent((Component*)colDectPenguin); // Het toevoegen van de collision component
 
 

@@ -41,7 +41,7 @@ public:
 		GameObject* newObject = new GameObject();
 		newObject->m_Name = a_Name;
 
-		if (a_Parent != nullptr || a_Parent != NULL)
+		if (a_Parent != nullptr)
 		{
 			newObject->m_Parent = a_Parent;
 			a_Parent->m_Children.push_back(newObject);
@@ -119,5 +119,15 @@ public:
 	inline void SetScale(const glm::vec3& newScale)
 		SMALL_SET(m_Scale, newScale)
 };
+
+template<typename T>
+inline T* GameObject::GetComponent()
+{
+	for (auto& component : m_Components)
+		if (typeid(component) == typeid(T))
+			return (T*)component;
+
+	return nullptr;
+}
 
 #endif

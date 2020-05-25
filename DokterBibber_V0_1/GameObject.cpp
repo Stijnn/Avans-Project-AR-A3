@@ -22,7 +22,7 @@ void GameObject::Draw()
 	//InternalDraw();
 }
 
-void GameObject::AddComponent(Component * a_Component)
+void GameObject::AddComponent(Component* a_Component)
 {
 	a_Component->SetTransform(this);
 	m_Components.push_back(a_Component);
@@ -57,14 +57,4 @@ void GameObject::RemoveChild(GameObject* a_Child)
 {
 	m_Children.remove(a_Child);
 	delete a_Child;
-}
-
-template<typename T>
-T* GameObject::GetComponent()
-{
-	for (auto& component : m_Components)
-		if (typeid(component) == typeid(T))
-			return component;
-
-	return nullptr;
 }
