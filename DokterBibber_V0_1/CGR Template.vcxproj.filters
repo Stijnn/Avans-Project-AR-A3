@@ -28,6 +28,12 @@
     <Filter Include="Source Files\Core">
       <UniqueIdentifier>{7eddefc1-1fb1-4b8d-bdf5-f3f22cec6fd4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Objects">
+      <UniqueIdentifier>{23b3a308-a0ff-468a-b1f2-95d5c5c28d66}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Object">
+      <UniqueIdentifier>{244735cb-035a-4888-affa-a346020e1be2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="tigl.cpp">
@@ -44,6 +50,18 @@
     </ClCompile>
     <ClCompile Include="ObjModel.cpp">
       <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="MouseControl.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TextControl.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GameObject.cpp">
+      <Filter>Source Files\Object</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene.cpp">
+      <Filter>Source Files\Object</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -73,6 +91,18 @@
     </ClInclude>
     <ClInclude Include="ObjModel.h">
       <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="MouseControl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TextControl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene.h">
+      <Filter>Header Files\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="GameObject.h">
+      <Filter>Header Files\Objects</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

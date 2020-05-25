@@ -24,21 +24,11 @@ public:
 	// Inherited via Component
 	virtual void Initialize	(void*)				override;
 	virtual void Update		(float a_DeltaTime) override;
-	virtual void Draw		(float a_DeltaTime) override;
-
-protected:
-	float m_Scale = 1.0f;
-	glm::vec3 m_Position;
+	virtual void Draw		()					override;
 	
 private:
 	std::vector<tigl::Vertex> m_Vertices;
 	ObjModel* m_ObjectModel;
-
-public:
-	inline float		GetScale ()							{ return m_Scale;			}
-	inline void			SetScale (float a_Scale)			{ m_Scale = a_Scale;		}
-	inline glm::vec3	GetPosition()						{ return m_Position;		}
-	inline void			SetPosition(glm::vec3 a_Position)	{ m_Position = a_Position;	}
 };
 
 #endif

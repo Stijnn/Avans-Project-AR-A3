@@ -20,6 +20,8 @@ using tigl::Vertex;
 #include "MouseControl.h"
 #include "TextControl.h"
 
+#include "Scene.h"
+
 #pragma comment(lib, "glfw3.lib")
 #pragma comment(lib, "glew32s.lib")
 #pragma comment(lib, "opengl32.lib")
@@ -29,6 +31,8 @@ MeshComponent* meshComponentPincet;
 
 cv::VideoCapture cap(1);
 cv::Mat frame;
+
+Scene* g_ptrMainScene;
 
 GLFWwindow* window;
 GLuint textureId = -1;
@@ -92,6 +96,10 @@ int main(void)
 
 void init()
 {
+	g_ptrMainScene = new Scene();
+	g_ptrMainScene->GetRootObject()->AddChild(GameObject::Instantiate("Pinguin"));
+	g_ptrMainScene->GetRootObject()->AddChild(GameObject::Instantiate("Pincet"));
+
     glfwSetKeyCallback(window, [](GLFWwindow* window, int key, int scancode, int action, int mods)
     {
         if (key == GLFW_KEY_ESCAPE)
@@ -108,16 +116,14 @@ void init()
 
     //Loads model from file Pinguin
 	//std::vector<Vertex> pinguinModel = ObjModel::load("E:\\Avans\\Proftaak AR\\DokterBibber_V0_1\\x64\\Debug\\PingquinBibber.obj");
-    std::vector<Vertex> pinguinModel = ObjModel::load("D:\\Avans\\Leerjaar 2\\Periode 4\\Project\\Avans-Project-AR-A3\\PingquinBibberV1.obj");
+    std::vector<Vertex> pinguinModel = ObjModel::load("Data/Models/Pinguin/PinguinBibber.obj");
     //std::vector<Vertex> pinguinModel = ObjModel::load("C:\\Users\\finni\\Documents\\Programming\\Project-Objects\\PingquinBibberV1.obj");
-	meshComponent = Component::Instantiate<MeshComponent>(&pinguinModel);
-	meshComponent->SetScale(1.0f);
+	(*g_ptrMainScene->GetRootObject())["Pinguin"]->AddComponent((Component*)(Component::Instantiate<MeshComponent>(&pinguinModel)));
 
     //Loads model from file Pincet
     std::vector<Vertex> pincetModel = ObjModel::load("D:\\Avans\\Leerjaar 2\\Periode 4\\Project\\Avans-Project-AR-A3\\PincetV1.obj");
     //std::vector<Vertex> pincetModel = ObjModel::load("C:\\Users\\finni\\Documents\\Programming\\Project-Objects\\PincetV1.obj");
     meshComponentPincet = Component::Instantiate<MeshComponent>(&pincetModel);
-    meshComponentPincet->SetScale(0.2f);
 
     mouse = new MouseControl(window, frameHeight, frameWidth, sensivityScaler);
     textWriter = new TextControl("C:/Windows/Fonts/times.ttf", 20, 1920.0f, 1080.0f);
@@ -126,8 +132,7 @@ void init()
 void update()
 {    
     mouse->updateMousePos(window);
-	meshComponent->Update(0);
-    meshComponentPincet->Update(0);
+	g_ptrMainScene->GetRootObject()->Update(0);
     duration = (std::clock() - start) / (double)CLOCKS_PER_SEC;
 }
 
@@ -160,7 +165,18 @@ void draw()
     tigl::shader->enableColor(true);
 
     // pincet movement
-    meshComponentPincet->SetPosition(glm::vec3(-mouse->getMouseXPos() * (sensivityScaler), 0, -mouse->getMouseYPos() * (sensivityScaler)));
+
+	/// <summary>
+	/// Example pincet movement met gameobjects
+	/// 1 - Retrieve actual object
+	/// 2 - Get Pos
+	/// 3 - Update Pos
+	/// 4 - Set Pos
+	/// </summary>
+	GameObject* pincetObj = (*g_ptrMainScene->GetRootObject())["Pincet"];
+	glm::vec3 pos = pincetObj->GetPosition();
+	pos = glm::vec3(-mouse->getMouseXPos() * (sensivityScaler), 0, -mouse->getMouseYPos() * (sensivityScaler));
+	pincetObj->SetPosition(pos);
 
     glm::mat4 projection = glm::perspective(55.0f, width / (float)height, 0.1f, 100.0f);
     glm::mat4 view = glm::lookAt(glm::vec3(0, 10.0f, 0), glm::vec3(0, 0, 0), glm::vec3(0, 1, -1.0f));
@@ -175,8 +191,7 @@ void draw()
 
     showCameraScreen();
 
-    meshComponent->Draw(0);
-    meshComponentPincet->Draw(0);
+	g_ptrMainScene->GetRootObject()->Draw();
 }
 
 void cubes() {  

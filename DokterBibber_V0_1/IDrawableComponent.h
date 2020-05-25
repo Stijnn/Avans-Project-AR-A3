@@ -2,6 +2,6 @@
 class IDrawableComponent
 {
 public:
-	virtual void Draw(float a_DeltaTime) abstract;
+	virtual void Draw() abstract;
 };
 

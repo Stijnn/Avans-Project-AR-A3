@@ -23,33 +23,33 @@
     <ProjectGuid>{A7ECF1BE-DB22-4BF7-BFF6-E3BF72691EE6}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>CGRTemplate</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.18362.0</WindowsTargetPlatformVersion>
     <ProjectName>DokterBibber</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
@@ -157,20 +157,28 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MeshComponent.cpp" />
+    <ClCompile Include="MouseControl.cpp" />
     <ClCompile Include="ObjModel.cpp" />
+    <ClCompile Include="Scene.cpp" />
+    <ClCompile Include="TextControl.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="tigl.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Component.h" />
+    <ClInclude Include="GameObject.h" />
     <ClInclude Include="IDrawableComponent.h" />
     <ClInclude Include="IInitializableComponent.h" />
     <ClInclude Include="IUpdatableComponent.h" />
     <ClInclude Include="MeshComponent.h" />
+    <ClInclude Include="MouseControl.h" />
     <ClInclude Include="ObjModel.h" />
+    <ClInclude Include="Scene.h" />
     <ClInclude Include="stb_image.h" />
+    <ClInclude Include="TextControl.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="tigl.h" />
   </ItemGroup>
