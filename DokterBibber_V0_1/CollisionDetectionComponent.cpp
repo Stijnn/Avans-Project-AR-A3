@@ -9,7 +9,14 @@ void CollisionDetectionComponent::Initialize(void* a_Parameter)
 
 void CollisionDetectionComponent::Update(float a_DeltaTime)
 {
+	for (auto child : m_Transform->GetChildren())
+	{
+		CollisionDetectionComponent* ptr = child->GetComponent<CollisionDetectionComponent>();
+		if (ptr != nullptr && ptr != this)
+		{
 
+		}
+	}
 }
 
 void CollisionDetectionComponent::Draw()
