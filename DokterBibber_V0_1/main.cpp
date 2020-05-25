@@ -11,6 +11,7 @@
 #include <sstream>  
 
 #include "MeshComponent.h"
+#include "CollisionDetectionComponent.h"
 
 using tigl::Vertex;
 
@@ -28,6 +29,8 @@ using tigl::Vertex;
 
 MeshComponent* meshComponent;
 MeshComponent* meshComponentPincet;
+CollisionDetectionComponent* colDect; // a lose collision component
+CollisionDetectionComponent* colDectPenguin; // a lose collision component
 
 cv::VideoCapture cap(1);
 cv::Mat frame;
@@ -58,7 +61,7 @@ int main(void)
     if (!glfwInit())
         throw "Could not initialize glwf";
 
-    window = glfwCreateWindow(1920, 1090, "Dokter Bibber!", NULL, NULL);
+    window = glfwCreateWindow(800, 720, "Dokter Bibber!", NULL, NULL);
 
     if (!window)
     {
@@ -80,19 +83,15 @@ int main(void)
             cv::flip(frame, frame, 3);
             BindCVMat2GLTexture(frame);
         }
-
 		update();
 		draw();
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
-
 	glfwTerminate();
-
 
     return 0;
 }
-
 
 void init()
 {
@@ -114,16 +113,25 @@ void init()
 
     glEnable(GL_DEPTH_TEST);
 
-    //Loads model from file Pinguin
-	//std::vector<Vertex> pinguinModel = ObjModel::load("E:\\Avans\\Proftaak AR\\DokterBibber_V0_1\\x64\\Debug\\PingquinBibber.obj");
-    std::vector<Vertex> pinguinModel = ObjModel::load("Data/Models/Pinguin/PinguinBibber.obj");
-    //std::vector<Vertex> pinguinModel = ObjModel::load("C:\\Users\\finni\\Documents\\Programming\\Project-Objects\\PingquinBibberV1.obj");
-	(*g_ptrMainScene->GetRootObject())["Pinguin"]->AddComponent((Component*)(Component::Instantiate<MeshComponent>(&pinguinModel)));
+	//Add MeshComponent to Pinguin GameObject
+	
+	/// <summary>
+	/// Nieuwe manier van inladen
+	/// </summary>
+	
+	GameObject* pinguinObj = (*g_ptrMainScene->GetRootObject())["Pinguin"]; // Verkrijgen van het opgeslagen gameobject
+	pinguinObj->AddComponent((Component*)(Component::Instantiate<MeshComponent>(&ObjModel::load("Data/Models/Pinguin/PinguinBibber.obj")))); // Het Toevoegen van een meshcomponent met data
 
-    //Loads model from file Pincet
-    std::vector<Vertex> pincetModel = ObjModel::load("D:\\Avans\\Leerjaar 2\\Periode 4\\Project\\Avans-Project-AR-A3\\PincetV1.obj");
-    //std::vector<Vertex> pincetModel = ObjModel::load("C:\\Users\\finni\\Documents\\Programming\\Project-Objects\\PincetV1.obj");
+    colDectPenguin = Component::Instantiate<CollisionDetectionComponent>(); // Het aanmaken van een collision component
+    colDectPenguin->initializeCollisionFrame(pinguinObj->GetComponent<MeshComponent>()->GetVertices()); // Het overgeven van de mesh data
+	pinguinObj->AddComponent((Component*)colDectPenguin); // Het toevoegen van de collision component
+
+
+    std::vector<Vertex> pincetModel = ObjModel::load("C:\\Users\\finni\\Documents\\Programming\\Project-Objects\\PincetV1.obj");
     meshComponentPincet = Component::Instantiate<MeshComponent>(&pincetModel);
+    colDect = Component::Instantiate<CollisionDetectionComponent>();
+    colDect->setMeshScalingValue(0.1f);
+    colDect->initializeCollisionFrame(pincetModel);    
 
     mouse = new MouseControl(window, frameHeight, frameWidth, sensivityScaler);
     textWriter = new TextControl("C:/Windows/Fonts/times.ttf", 20, 1920.0f, 1080.0f);
@@ -132,7 +140,20 @@ void init()
 void update()
 {    
     mouse->updateMousePos(window);
+
 	g_ptrMainScene->GetRootObject()->Update(0);
+
+	/// <summary>
+	/// TODO: Even uitwerken hoe dit gemakkelijker kan
+	/// </summary>
+	
+    //colDect->SetPosition(meshComponentPincet->GetPosition());
+
+    //if (colDect->checkComponentCollision(*colDect, *colDectPenguin))
+    //{
+    //    std::cout << "Collision!" << std::endl;
+    //}
+
     duration = (std::clock() - start) / (double)CLOCKS_PER_SEC;
 }
 
@@ -231,7 +252,6 @@ void showCameraScreen() {
 
     tigl::end();
 }
-
 
 void BindCVMat2GLTexture(cv::Mat& image)
 {

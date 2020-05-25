@@ -29,6 +29,9 @@ public:
 private:
 	std::vector<tigl::Vertex> m_Vertices;
 	ObjModel* m_ObjectModel;
+
+public:
+	inline const std::vector<tigl::Vertex>& GetVertices() { return m_Vertices; }
 };
 
 #endif

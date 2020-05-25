@@ -58,3 +58,13 @@ void GameObject::RemoveChild(GameObject* a_Child)
 	m_Children.remove(a_Child);
 	delete a_Child;
 }
+
+template<typename T>
+T* GameObject::GetComponent()
+{
+	for (auto& component : m_Components)
+		if (typeid(component) == typeid(T))
+			return component;
+
+	return nullptr;
+}

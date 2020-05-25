@@ -9,6 +9,7 @@
 
 #include <list>
 #include <glm/vec3.hpp>
+#include <string>
 
 class Component;
 
@@ -120,13 +121,3 @@ public:
 };
 
 #endif
-
-template<typename T>
-inline T* GameObject::GetComponent()
-{
-	for (auto& component : m_Components)
-		if (typeid(component) == typeid(T))
-			return component;
-
-	return nullptr;
-}

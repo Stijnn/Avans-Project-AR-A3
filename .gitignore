@@ -353,3 +353,4 @@ healthchecksdb
 MigrationBackup/
 
 # End of https://www.gitignore.io/api/visualstudio
+DokterBibber_V0_1/opencv_world3410d.dll
