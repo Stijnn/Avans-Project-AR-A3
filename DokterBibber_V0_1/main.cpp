@@ -121,19 +121,27 @@ void init()
 	/// </summary>
 	
 	GameObject* pinguinObj = (*g_ptrMainScene->GetRootObject())["Pinguin"]; // Verkrijgen van het opgeslagen gameobject
-    MeshComponent* c = Component::Instantiate<MeshComponent>(&ObjModel::load("Data/Models/Pinguin/PinguinBibber.obj"));
-	pinguinObj->AddComponent((Component*)c); // Het Toevoegen van een meshcomponent met data
+    MeshComponent* pinguinMesh = Component::Instantiate<MeshComponent>(&ObjModel::load("Data/Models/Pinguin/PinguinBibber.obj"));
+	pinguinObj->AddComponent((Component*)pinguinMesh); // Het Toevoegen van een meshcomponent met data
 
     colDectPenguin = Component::Instantiate<CollisionDetectionComponent>(); // Het aanmaken van een collision component
-    colDectPenguin->initializeCollisionFrame(c->GetVertices()); // Het overgeven van de mesh data
+    colDectPenguin->initializeCollisionFrame(pinguinMesh->GetVertices()); // Het overgeven van de mesh data
 	pinguinObj->AddComponent((Component*)colDectPenguin); // Het toevoegen van de collision component
 
+    GameObject* pincetObj = (*g_ptrMainScene->GetRootObject())["Pincet"]; // Verkrijgen van het opgeslagen gameobject
+    MeshComponent* pincetMesh = Component::Instantiate<MeshComponent>(&ObjModel::load("Data/Models/Pincet/Pincet.obj"));
+    pincetObj->AddComponent((Component*)pincetMesh); // Het Toevoegen van een meshcomponent met data
 
-    std::vector<Vertex> pincetModel = ObjModel::load("C:\\Users\\finni\\Documents\\Programming\\Project-Objects\\PincetV1.obj");
+    colDect = Component::Instantiate<CollisionDetectionComponent>(); // Het aanmaken van een collision component
+    colDect->initializeCollisionFrame(pincetMesh->GetVertices()); // Het overgeven van de mesh data
+    pincetObj->AddComponent((Component*)colDect); // Het toevoegen van de collision component
+
+
+    /*std::vector<Vertex> pincetModel = ObjModel::load("C:\\Users\\finni\\Documents\\Programming\\Project-Objects\\PincetV1.obj");
     meshComponentPincet = Component::Instantiate<MeshComponent>(&pincetModel);
     colDect = Component::Instantiate<CollisionDetectionComponent>();
     colDect->setMeshScalingValue(0.1f);
-    colDect->initializeCollisionFrame(pincetModel);    
+    colDect->initializeCollisionFrame(pincetModel);    */
 
     mouse = new MouseControl(window, frameHeight, frameWidth, sensivityScaler);
     textWriter = new TextControl("C:/Windows/Fonts/times.ttf", 20, 1920.0f, 1080.0f);

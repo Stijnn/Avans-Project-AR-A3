@@ -120,13 +120,29 @@ public:
 		SMALL_SET(m_Scale, newScale)
 };
 
+//template<class T>
+//inline T* GameObject::GetComponent()
+//{
+//	for (auto& c : m_Components)
+//	{
+//		T* t = dynamic_cast<T*>(c);
+//		if (t)
+//			return t;
+//	}
+//	return nullptr;
+//}
+
 template<typename T>
 inline T* GameObject::GetComponent()
 {
-	for (auto& component : m_Components)
-		if (typeid(component) == typeid(T))
+	for (auto& component : m_Components) 
+	{	
+		std::string com = typeid(component).name();
+		std::string s = typeid(T).name();
+		//if (std::is_same<component, T>::value);
+		if (typeid(component).name() == typeid(T).name()) // class CLASS			
 			return (T*)component;
-
+	}
 	return nullptr;
 }
 

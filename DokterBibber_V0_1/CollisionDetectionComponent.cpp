@@ -1,6 +1,7 @@
 #include "CollisionDetectionComponent.h"
 #include <algorithm>
 #include <glm\ext\matrix_transform.hpp>
+#include "MeshComponent.h"
 
 void CollisionDetectionComponent::Initialize(void* a_Parameter)
 {
@@ -9,22 +10,40 @@ void CollisionDetectionComponent::Initialize(void* a_Parameter)
 
 void CollisionDetectionComponent::Update(float a_DeltaTime)
 {
-	for (auto child : m_Transform->GetChildren())
+	for (auto objectChild : m_Transform->GetParent()->GetChildren())
 	{
-		CollisionDetectionComponent* ptr = child->GetComponent<CollisionDetectionComponent>();
-		if (ptr != nullptr && ptr != this)
+		for (auto componentChild : objectChild->GetComponents())
 		{
+			std::string s = typeid(componentChild).raw_name();
+			std::string th = typeid(this).raw_name();
+			//MeshComponent* com = componentChild->GetTransform()->GetComponent<MeshComponent>();
 
-		}
+			bool isInstanceOfCDC = componentChild->GetComponentName() == typeid(CollisionDetectionComponent).name();
+			if (componentChild != nullptr && componentChild != this && isInstanceOfCDC)
+			{
+				bool collisionX = this->m_Transform->GetPosition().x + this->xLength >= componentChild->GetTransform()->GetPosition().x &&
+					componentChild->GetTransform()->GetPosition().x + componentChild->GetTransform()->GetComponent<CollisionDetectionComponent>()->xLength >= this->m_Transform->GetPosition().x;
+
+				//bool collisionY = this->m_Transform->GetPosition().y + this->yLength >= second_object->m_Transform->GetPosition().y &&
+				//	second_object->m_Transform->GetPosition().y + second_object->yLength >= this->m_Transform->GetPosition().y;
+
+			//	bool collisionZ = this->m_Transform->GetPosition().z + this->zLength >= second_object->m_Transform->GetPosition().z &&
+			//		second_object->m_Transform->GetPosition().z + second_object->zLength >= this->m_Transform->GetPosition().z;
+
+			//	bool CollisionOccured = collisionX && collisionY && collisionZ; // if there is collision on the object detect correctly
+			}
+		}			
 	}
 }
 
 void CollisionDetectionComponent::Draw()
 {
 	glm::mat4 modelMatrix(1);
-	modelMatrix = glm::translate(modelMatrix, m_Position);
-	modelMatrix = glm::rotate(modelMatrix, glm::radians(180.0f), glm::vec3(0, 1, 0));
-	modelMatrix = glm::scale(modelMatrix, glm::vec3(m_Scale, m_Scale, m_Scale));
+	modelMatrix = glm::translate(modelMatrix, m_Transform->GetPosition());
+	modelMatrix = glm::rotate(modelMatrix, glm::radians(m_Transform->GetRotation()[0]), glm::vec3(1, 0, 0));
+	modelMatrix = glm::rotate(modelMatrix, glm::radians(m_Transform->GetRotation()[1]), glm::vec3(0, 1, 0));
+	modelMatrix = glm::rotate(modelMatrix, glm::radians(m_Transform->GetRotation()[2]), glm::vec3(0, 0, 1));
+	modelMatrix = glm::scale(modelMatrix, glm::vec3(m_Transform->GetScale()[0], m_Transform->GetScale()[1], m_Transform->GetScale()[2]));
 
 	tigl::shader->setModelMatrix(modelMatrix);
 
