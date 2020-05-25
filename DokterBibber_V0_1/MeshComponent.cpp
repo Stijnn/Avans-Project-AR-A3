@@ -19,9 +19,10 @@ void MeshComponent::Draw(float a_DeltaTime)
 	modelMatrix = glm::scale(modelMatrix, glm::vec3(m_Scale, m_Scale, m_Scale));
 
 	tigl::shader->setModelMatrix(modelMatrix);
+	tigl::drawVertices(GL_TRIANGLES, m_Vertices);
 
-	tigl::begin(GL_TRIANGLES);
+	/*tigl::begin(GL_TRIANGLES);
 	for (auto& vert : m_Vertices)
 		tigl::addVertex(vert);
-	tigl::end();
+	tigl::end();*/
 }
