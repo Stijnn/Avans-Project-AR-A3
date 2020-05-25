@@ -19,6 +19,7 @@ using tigl::Vertex;
 #include <ctime>
 #include "MouseControl.h"
 #include "TextControl.h"
+#include "FpsCam.h"
 
 #pragma comment(lib, "glfw3.lib")
 #pragma comment(lib, "glew32s.lib")
@@ -27,7 +28,7 @@ using tigl::Vertex;
 MeshComponent* meshComponent;
 MeshComponent* meshComponentPincet;
 
-cv::VideoCapture cap(1);
+cv::VideoCapture cap(0);
 cv::Mat frame;
 
 GLFWwindow* window;
@@ -89,6 +90,7 @@ int main(void)
     return 0;
 }
 
+FpsCam* camera;
 
 void init()
 {
@@ -104,17 +106,23 @@ void init()
             mouse->updateMouseMode(window, GLFW_CURSOR_DISABLED); // makes the mouse invisible by pressing H
     });
 
+	camera = new FpsCam(window);
+
+	//set camera to standard postion
+	camera->setInit(); 
+
+
     glEnable(GL_DEPTH_TEST);
 
     //Loads model from file Pinguin
 	//std::vector<Vertex> pinguinModel = ObjModel::load("E:\\Avans\\Proftaak AR\\DokterBibber_V0_1\\x64\\Debug\\PingquinBibber.obj");
-    std::vector<Vertex> pinguinModel = ObjModel::load("D:\\Avans\\Leerjaar 2\\Periode 4\\Project\\Avans-Project-AR-A3\\PingquinBibberV1.obj");
+    std::vector<Vertex> pinguinModel = ObjModel::load("C:\\Users\\joelle\\Documents\\Avans_map\\jaar_2\\2.4\\projecr\\git\\new2\\Avans-Project-AR-A3\\PingquinBibber.obj");
     //std::vector<Vertex> pinguinModel = ObjModel::load("C:\\Users\\finni\\Documents\\Programming\\Project-Objects\\PingquinBibberV1.obj");
 	meshComponent = Component::Instantiate<MeshComponent>(&pinguinModel);
 	meshComponent->SetScale(1.0f);
 
     //Loads model from file Pincet
-    std::vector<Vertex> pincetModel = ObjModel::load("D:\\Avans\\Leerjaar 2\\Periode 4\\Project\\Avans-Project-AR-A3\\PincetV1.obj");
+    std::vector<Vertex> pincetModel = ObjModel::load("C:\\Users\\joelle\\Documents\\Avans_map\\jaar_2\\2.4\\projecr\\git\\new2\\Avans-Project-AR-A3\\PincetV1.obj");
     //std::vector<Vertex> pincetModel = ObjModel::load("C:\\Users\\finni\\Documents\\Programming\\Project-Objects\\PincetV1.obj");
     meshComponentPincet = Component::Instantiate<MeshComponent>(&pincetModel);
     meshComponentPincet->SetScale(0.2f);
@@ -125,6 +133,7 @@ void init()
 
 void update()
 {    
+	camera->update(window);
     mouse->updateMousePos(window);
 	meshComponent->Update(0);
     meshComponentPincet->Update(0);
@@ -133,6 +142,9 @@ void update()
 
 void draw()
 {
+
+	
+
     int width, height;
     glfwGetWindowSize(window, &width, &height);
 
@@ -165,15 +177,29 @@ void draw()
     glm::mat4 projection = glm::perspective(55.0f, width / (float)height, 0.1f, 100.0f);
     glm::mat4 view = glm::lookAt(glm::vec3(0, 10.0f, 0), glm::vec3(0, 0, 0), glm::vec3(0, 1, -1.0f));
 
+	
+
     tigl::shader->setProjectionMatrix(projection);
     tigl::shader->setViewMatrix(view);
+	tigl::shader->setViewMatrix(camera->getMatrix());
 
     tigl::shader->enableTexture(true);
     tigl::shader->enableColor(true);
 
+	tigl::shader->enableLighting(true);
+	tigl::shader->setLightCount(1);
+	tigl::shader->setLightDirectional(0, false);
+	tigl::shader->setLightPosition(0, glm::vec3(2, 2, 3));
+	tigl::shader->setLightAmbient(0, glm::vec3(0.1f, 0.1f, 0.15f));
+	tigl::shader->setLightDiffuse(0, glm::vec3(0.8f, 0.8f, 0.8f));
+	tigl::shader->setLightSpecular(0, glm::vec3(0, 0, 0));
+	tigl::shader->setShinyness(32.0f);
+
     glBindTexture(GL_TEXTURE_2D, textureId);
 
     showCameraScreen();
+
+	cubes(); 
 
     meshComponent->Draw(0);
     meshComponentPincet->Draw(0);
@@ -185,13 +211,66 @@ void cubes() {
     model = glm::rotate(model, 0.f, glm::vec3(1, 1, 0));
 
     tigl::shader->setModelMatrix(model);
+	tigl::shader->enableAlphaTest(true); 
 
     tigl::begin(GL_QUADS);
-    tigl::addVertex(Vertex::PC(glm::vec3(-5, 1, -5), glm::vec4(-5, 1, 5, 1)));
-    tigl::addVertex(Vertex::PC(glm::vec3(-5, 1, 5), glm::vec4(5, 1, 5, 1)));
-    tigl::addVertex(Vertex::PC(glm::vec3(5, 1, 5), glm::vec4(5, 1, -5, 1)));
-    tigl::addVertex(Vertex::PC(glm::vec3(5, 1, -5), glm::vec4(-5, 1, -5, 1)));
-
+	
+	//rondje
+	double x = 0;
+	double z = 0;
+	tigl::addVertex(Vertex::PC(glm::vec3(-0.5 + x, 1, -0.5 + z), glm::vec4(-5, 1, 5, 0)));
+	tigl::addVertex(Vertex::PC(glm::vec3(-0.5 + x, 1, 1 + z), glm::vec4(5, 1, 5, 0)));
+	tigl::addVertex(Vertex::PC(glm::vec3(1 + x, 1, 1 + z), glm::vec4(5, 1, -5, 0)));
+	tigl::addVertex(Vertex::PC(glm::vec3(1 + x, 1, -0.5 + z), glm::vec4(-5, 1, -5, 0)));
+	//driehoek
+	x = 1;
+	z = -1.2;
+	tigl::addVertex(Vertex::PC(glm::vec3(-0.5 + x, 1, -0.5 + z), glm::vec4(-5, 1, 5, 0)));
+	tigl::addVertex(Vertex::PC(glm::vec3(-0.5 + x, 1, 1 + z), glm::vec4(5, 1, 5, 0)));
+	tigl::addVertex(Vertex::PC(glm::vec3(1 + x, 1, 1 + z), glm::vec4(5, 1, -5, 0)));
+	tigl::addVertex(Vertex::PC(glm::vec3(1 + x, 1, -0.5 + z), glm::vec4(-5, 1, -5, 0)));
+	//katapult
+	x = -1.5;
+	z = -1.6;
+	tigl::addVertex(Vertex::PC(glm::vec3(-0.5 + x, 1, -0.5 + z), glm::vec4(-5, 1, 5, 0)));
+	tigl::addVertex(Vertex::PC(glm::vec3(-0.5 + x, 1, 1 + z), glm::vec4(5, 1, 5, 0)));
+	tigl::addVertex(Vertex::PC(glm::vec3(1 + x, 1, 1 + z), glm::vec4(5, 1, -5, 0)));
+	tigl::addVertex(Vertex::PC(glm::vec3(1 + x, 1, -0.5 + z), glm::vec4(-5, 1, -5, 0)));
+	//bot
+	x = -2.5;
+	z = -1.8;
+	tigl::addVertex(Vertex::PC(glm::vec3(-0.5 + x, 1, -0.5 + z), glm::vec4(-5, 1, 5, 0)));
+	tigl::addVertex(Vertex::PC(glm::vec3(-0.5 + x, 1, 1 + z), glm::vec4(5, 1, 5, 0)));
+	tigl::addVertex(Vertex::PC(glm::vec3(1 + x, 1, 1 + z), glm::vec4(5, 1, -5, 0)));
+	tigl::addVertex(Vertex::PC(glm::vec3(1 + x, 1, -0.5 + z), glm::vec4(-5, 1, -5, 0)));
+	//cirkel
+	x = -2.5;
+	z = -3;
+	tigl::addVertex(Vertex::PC(glm::vec3(-0.5 + x, 1, -0.5 + z), glm::vec4(-5, 1, 5, 0)));
+	tigl::addVertex(Vertex::PC(glm::vec3(-0.5 + x, 1, 1 + z), glm::vec4(5, 1, 5, 0)));
+	tigl::addVertex(Vertex::PC(glm::vec3(1 + x, 1, 1 + z), glm::vec4(5, 1, -5, 0)));
+	tigl::addVertex(Vertex::PC(glm::vec3(1 + x, 1, -0.5 + z), glm::vec4(-5, 1, -5, 0)));
+	//hartje
+	x = -2.5;
+	z = -0.5;
+	tigl::addVertex(Vertex::PC(glm::vec3(-0.5 + x, 1, -0.5 + z), glm::vec4(-5, 1, 5, 0)));
+	tigl::addVertex(Vertex::PC(glm::vec3(-0.5 + x, 1, 1 + z), glm::vec4(5, 1, 5, 0)));
+	tigl::addVertex(Vertex::PC(glm::vec3(1 + x, 1, 1 + z), glm::vec4(5, 1, -5, 0)));
+	tigl::addVertex(Vertex::PC(glm::vec3(1 + x, 1, -0.5 + z), glm::vec4(-5, 1, -5, 0)));
+	//botinarm
+	x = -3.2;
+	z = -0.5;
+	tigl::addVertex(Vertex::PC(glm::vec3(-0.5 + x, 1, -0.5 + z), glm::vec4(-5, 1, 5, 0)));
+	tigl::addVertex(Vertex::PC(glm::vec3(-0.5 + x, 1, 1 + z), glm::vec4(5, 1, 5, 0)));
+	tigl::addVertex(Vertex::PC(glm::vec3(1 + x, 1, 1 + z), glm::vec4(5, 1, -5, 0)));
+	tigl::addVertex(Vertex::PC(glm::vec3(1 + x, 1, -0.5 + z), glm::vec4(-5, 1, -5, 0)));
+	//Gatinhoofd
+	x = -1.3;
+	z = 2.7;
+	tigl::addVertex(Vertex::PC(glm::vec3(-0.5 + x, 1, -0.5 + z), glm::vec4(-5, 1, 5, 0)));
+	tigl::addVertex(Vertex::PC(glm::vec3(-0.5 + x, 1, 1 + z), glm::vec4(5, 1, 5, 0)));
+	tigl::addVertex(Vertex::PC(glm::vec3(1 + x, 1, 1 + z), glm::vec4(5, 1, -5, 0)));
+	tigl::addVertex(Vertex::PC(glm::vec3(1 + x, 1, -0.5 + z), glm::vec4(-5, 1, -5, 0)));
     tigl::end();
 }
 
