@@ -14,6 +14,11 @@
 
 using tigl::Vertex;
 
+#include <irrKlang.h>
+
+
+
+
 #include "stb_image.h" 
 #include <chrono>
 #include <ctime>
@@ -24,6 +29,11 @@ using tigl::Vertex;
 #pragma comment(lib, "glfw3.lib")
 #pragma comment(lib, "glew32s.lib")
 #pragma comment(lib, "opengl32.lib")
+#pragma comment(lib, "irrKlang.lib") // link with irrKlang.dll
+
+
+irrklang::ISoundEngine* engine;
+irrklang::ISound* backgroundMusic;
 
 MeshComponent* meshComponent;
 MeshComponent* meshComponentPincet;
@@ -52,6 +62,12 @@ void showCameraScreen();
 
 int main(void)
 {
+
+	// start the sound engine with default parameters
+	engine = irrklang::createIrrKlangDevice();
+	if (!engine)
+		return 0; // error starting up the engine
+
     if (!glfwInit())
         throw "Could not initialize glwf";
 
@@ -63,6 +79,8 @@ int main(void)
         throw "Could not initialize glwf";
     }
     glfwMakeContextCurrent(window);
+
+	backgroundMusic = engine->play2D("backgroundHobbit.mp3", true, false, true);
 
     tigl::init();
 
@@ -104,6 +122,13 @@ void init()
             mouse->updateMouseMode(window, GLFW_CURSOR_NORMAL); // makes the mouse visible by pressing N
         if (key == GLFW_KEY_H)
             mouse->updateMouseMode(window, GLFW_CURSOR_DISABLED); // makes the mouse invisible by pressing H
+		if (key == GLFW_KEY_SPACE)
+		{
+			engine->play2D("Buzzer.mp3", false);
+		} if (key == GLFW_KEY_Z)
+		{
+			backgroundMusic->setIsPaused(!backgroundMusic->getIsPaused());
+		}
     });
 
 	camera = new FpsCam(window);
