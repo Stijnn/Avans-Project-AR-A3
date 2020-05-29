@@ -3,16 +3,17 @@
 #include "ObjModel.h"
 
 #pragma once
-class CollisionDetectionComponent : Component
+class CollisionDetectionComponent 
+	: public Component
 {
 public:
 	CollisionDetectionComponent() : 
-		Component("CollisionDetectionComponent") 
+		Component("class CollisionDetectionComponent")
 	{}
 
 	virtual void Initialize(void* a_Parameter)	override;
 	virtual void Update(float a_DeltaTime)		override;
-	virtual void Draw()		override;
+	virtual void Draw()							override;
 
 	bool checkComponentCollision(const CollisionDetectionComponent& main_object, const CollisionDetectionComponent& second_object);
 	void initializeCollisionFrame(const std::vector<tigl::Vertex>& objectVerts);

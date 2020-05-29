@@ -74,7 +74,7 @@ public:
 	static T* Instantiate(void* a_Params)
 	{
 		static_assert(std::is_base_of<Component, T>::value, "T must inherit from Component");
-		Component* base = (Component*)new T();
+		Component* base = (Component*)(new T());
 
 		if (a_Params != nullptr)
 			base->Initialize(a_Params);

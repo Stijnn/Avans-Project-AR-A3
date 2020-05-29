@@ -51,20 +51,23 @@
     <ClCompile Include="ObjModel.cpp">
       <Filter>Source Files\Core</Filter>
     </ClCompile>
-    <ClCompile Include="CollisionDetectionComponent.cpp">
-      <Filter>Source Files\Components</Filter>
-    </ClCompile>
     <ClCompile Include="MouseControl.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FpsCam.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GameObject.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="TextControl.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="GameObject.cpp">
-      <Filter>Source Files\Object</Filter>
-    </ClCompile>
-    <ClCompile Include="Scene.cpp">
-      <Filter>Source Files\Object</Filter>
+    <ClCompile Include="CollisionDetectionComponent.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="BackgroundRemover.cpp">
       <Filter>Source Files</Filter>
@@ -108,19 +111,22 @@
       <Filter>Header Files\Core</Filter>
     </ClInclude>
     <ClInclude Include="CollisionDetectionComponent.h">
-      <Filter>Header Files\Components</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="MouseControl.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="TextControl.h">
+    <ClInclude Include="Scene.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FpsCam.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="GameObject.h">
-      <Filter>Header Files\Objects</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Scene.h">
-      <Filter>Header Files\Objects</Filter>
+    <ClInclude Include="TextControl.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="BackgroundRemover.h">
       <Filter>Header Files</Filter>
