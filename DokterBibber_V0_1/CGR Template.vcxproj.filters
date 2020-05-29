@@ -66,6 +66,9 @@
     <ClCompile Include="Scene.cpp">
       <Filter>Source Files\Object</Filter>
     </ClCompile>
+    <ClCompile Include="FpsCam.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="tigl.h">
@@ -94,21 +97,6 @@
     </ClInclude>
     <ClInclude Include="ObjModel.h">
       <Filter>Header Files\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="CollisionDetectionComponent.h">
-      <Filter>Header Files\Components</Filter>
-    </ClInclude>
-    <ClInclude Include="MouseControl.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="TextControl.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="GameObject.h">
-      <Filter>Header Files\Objects</Filter>
-    </ClInclude>
-    <ClInclude Include="Scene.h">
-      <Filter>Header Files\Objects</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
