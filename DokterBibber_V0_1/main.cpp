@@ -51,6 +51,11 @@ constexpr float sensivityScaler = 0.1;
 constexpr float frameWidth = 1000 / 9;
 constexpr float frameHeight = 1000 / 16;
 
+int iLastX;
+int iLastY;
+int posX;
+int posY;
+
 cv::Mat frame, frameOut, handMask, foreground, fingerCountDebug;
 
 BackgroundRemover backgroundRemover;
@@ -102,6 +107,23 @@ int main(void)
             faceDetector.removeFaces(frame, foreground);
             handMask = skinDetector.getSkinMask(foreground);
             fingerCountDebug = fingerCount.findFingersCount(handMask, frameOut);
+
+            Moments oMoments = moments(handMask);
+
+            double dM01 = oMoments.m01;
+            double dM10 = oMoments.m10;
+            double dArea = oMoments.m00;
+
+            //calculate the position of the ball
+            posX = dM10 / dArea;
+            posY = dM01 / dArea;
+
+            if (iLastX >= 0 && iLastY >= 0 && posX >= 0 && posY >= 0)
+            {
+                circle(frameOut, Point(posX, posY), 5, Scalar(255, 0, 255), 2, 8);
+                //Draw a red line from the previous point to the current point
+                //line(imgLines, Point(posX, posY), Point(iLastX, iLastY), Scalar(0, 0, 255), 2);
+            }
 
             imshow("output", frameOut);
             imshow("foreground", foreground);
@@ -222,7 +244,8 @@ void draw()
 
     textWriter->setScale(1.4f);
     textWriter->drawText(buffer.str(), 0, -800);
-    std::string coordsXY("X: " + std::to_string(-mouse->getMouseXPos() * (sensivityScaler)) + ", coord Y: " + std::to_string(-mouse->getMouseYPos() * (sensivityScaler)));
+    //std::string coordsXY("X: " + std::to_string(-mouse->getMouseXPos() * (sensivityScaler)) + ", coord Y: " + std::to_string(-mouse->getMouseYPos() * (sensivityScaler)));
+    std::string coordsXY("X: " + std::to_string(posX * (sensivityScaler)) + ", coord Y: " + std::to_string(posY * (sensivityScaler)));
 
     // coord text
     textWriter->setScale(1.1f);
@@ -240,8 +263,9 @@ void draw()
 	/// </summary>
 	GameObject* pincetObj = (*g_ptrMainScene->GetRootObject())["Pincet"];
 	glm::vec3 pos = pincetObj->GetPosition();
-	pos = glm::vec3(-mouse->getMouseXPos() * (sensivityScaler), 0, -mouse->getMouseYPos() * (sensivityScaler));
-	pincetObj->SetPosition(pos);
+    //pos = glm::vec3(-mouse->getMouseXPos() * (sensivityScaler), 0, -mouse->getMouseYPos() * (sensivityScaler));
+    pos = glm::vec3(posX * (sensivityScaler), 0, posY * (sensivityScaler));
+    pincetObj->SetPosition(pos);
 
     glm::mat4 projection = glm::perspective(55.0f, width / (float)height, 0.1f, 100.0f);
     glm::mat4 view = glm::lookAt(glm::vec3(0, 10.0f, 0), glm::vec3(0, 0, 0), glm::vec3(0, 1, -1.0f));
