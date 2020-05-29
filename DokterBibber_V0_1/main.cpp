@@ -23,6 +23,10 @@ using tigl::Vertex;
 #include "TextControl.h"
 
 #include "Scene.h"
+#include "BackgroundRemover.h"
+#include "SkinDetector.h"
+#include "FaceDetector.h"
+#include "FingerCount.h"
 
 #pragma comment(lib, "glfw3.lib")
 #pragma comment(lib, "glew32s.lib")
@@ -33,8 +37,7 @@ MeshComponent* meshComponentPincet;
 CollisionDetectionComponent* colDect; // a lose collision component
 CollisionDetectionComponent* colDectPenguin; // a lose collision component
 
-cv::VideoCapture cap(1);
-cv::Mat frame;
+cv::VideoCapture cap(0);
 
 Scene* g_ptrMainScene;
 
@@ -47,6 +50,13 @@ TextControl* textWriter;
 constexpr float sensivityScaler = 0.1;
 constexpr float frameWidth = 1000 / 9;
 constexpr float frameHeight = 1000 / 16;
+
+cv::Mat frame, frameOut, handMask, foreground, fingerCountDebug;
+
+BackgroundRemover backgroundRemover;
+SkinDetector skinDetector;
+FaceDetector faceDetector;
+FingerCount fingerCount;
 
 void init();
 void update();
@@ -62,7 +72,7 @@ int main(void)
     if (!glfwInit())
         throw "Could not initialize glwf";
 
-    window = glfwCreateWindow(800, 720, "Dokter Bibber!", NULL, NULL);
+    window = glfwCreateWindow(1920, 1080, "Dokter Bibber!", NULL, NULL);
 
     if (!window)
     {
@@ -82,7 +92,30 @@ int main(void)
         if (cameraAvailable) {
             cap.read(frame);
             cv::flip(frame, frame, 3);
+
+            frameOut = frame.clone();
+
+            skinDetector.drawSkinColorSampler(frameOut);
+
+            foreground = backgroundRemover.getForeground(frame);
+
+            faceDetector.removeFaces(frame, foreground);
+            handMask = skinDetector.getSkinMask(foreground);
+            fingerCountDebug = fingerCount.findFingersCount(handMask, frameOut);
+
+            imshow("output", frameOut);
+            imshow("foreground", foreground);
+            imshow("handMask", handMask);
+            imshow("handDetection", fingerCountDebug);
+
             BindCVMat2GLTexture(frame);
+
+            int key = waitKey(1);
+
+            if (key == 98) // b
+                backgroundRemover.calibrate(frame);
+            else if (key == 115) // s
+                skinDetector.calibrate(frame);
         }
 		update();
 		draw();

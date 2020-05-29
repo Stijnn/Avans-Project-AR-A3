@@ -159,20 +159,27 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="BackgroundRemover.cpp" />
     <ClCompile Include="CollisionDetectionComponent.cpp" />
+    <ClCompile Include="FaceDetector.cpp" />
+    <ClCompile Include="FingerCount.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MeshComponent.cpp" />
     <ClCompile Include="MouseControl.cpp" />
     <ClCompile Include="ObjModel.cpp" />
     <ClCompile Include="Scene.cpp" />
+    <ClCompile Include="SkinDetector.cpp" />
     <ClCompile Include="TextControl.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="tigl.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="BackgroundRemover.h" />
     <ClInclude Include="CollisionDetectionComponent.h" />
     <ClInclude Include="Component.h" />
+    <ClInclude Include="FaceDetector.h" />
+    <ClInclude Include="FingerCount.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="IDrawableComponent.h" />
     <ClInclude Include="IInitializableComponent.h" />
@@ -181,6 +188,7 @@
     <ClInclude Include="MouseControl.h" />
     <ClInclude Include="ObjModel.h" />
     <ClInclude Include="Scene.h" />
+    <ClInclude Include="SkinDetector.h" />
     <ClInclude Include="stb_image.h" />
     <ClInclude Include="TextControl.h" />
     <ClInclude Include="Texture.h" />
