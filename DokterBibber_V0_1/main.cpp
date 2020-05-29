@@ -225,7 +225,7 @@ void init()
 
 
     GameObject* pincetObj = (*g_ptrMainScene->GetRootObject())["Pincet"]; // Verkrijgen van het opgeslagen gameobject
-    MeshComponent* pincetMesh = Component::Instantiate<MeshComponent>(&ObjModel::load("Data/Models/Pincet/PincetV1.obj"));
+    MeshComponent* pincetMesh = Component::Instantiate<MeshComponent>(&ObjModel::load("Data/Models/PincetV1.obj"));
     pincetObj->AddComponent(pincetMesh); // Het Toevoegen van een meshcomponent met data
 
     colDect = Component::Instantiate<CollisionDetectionComponent>(); // Het aanmaken van een collision component
@@ -233,7 +233,6 @@ void init()
     pincetObj->AddComponent(colDect); // Het toevoegen van de collision component
 
     //Pick-up objecten
-
     //Bone
     GameObject* BoneObj = (*g_ptrMainScene->GetRootObject())["Bone"]; // Verkrijgen van het opgeslagen gameobject
     MeshComponent* BoneMesh = Component::Instantiate<MeshComponent>(&ObjModel::load("Data/Models/Pickup/PingquinBibberBoneobj.obj"));
@@ -248,7 +247,6 @@ void init()
     MeshComponent* HeartMesh = Component::Instantiate<MeshComponent>(&ObjModel::load("Data/Models/Pickup/PingquinBibberHeart.obj"));
     HeartObj->AddComponent(HeartMesh); // Het Toevoegen van een meshcomponent met data
 
-    std::vector<Vertex> pincetModel = ObjModel::load("D:\\Avans\\Leerjaar 2\\Periode 4\\Project\\Avans-Project-AR-A3\\PincetV1.obj");
     colDect = Component::Instantiate<CollisionDetectionComponent>(); // Het aanmaken van een collision component
     colDect->initializeCollisionFrame(HeartMesh->GetVertices()); // Het overgeven van de mesh data
     HeartObj->AddComponent(colDect); // Het toevoegen van de collision component
@@ -373,7 +371,7 @@ void draw()
 	GameObject* pincetObj = (*g_ptrMainScene->GetRootObject())["Pincet"];
 	glm::vec3 pos = pincetObj->GetPosition();
     //pos = glm::vec3(-mouse->getMouseXPos() * (sensivityScaler), 0, -mouse->getMouseYPos() * (sensivityScaler));
-    pos = glm::vec3(posX * (sensivityScaler), 0, posY * (sensivityScaler));
+    pos = glm::vec3(-posX * (sensivityScaler), 0, -posY * (sensivityScaler));
     pincetObj->SetPosition(pos);
 
     glm::mat4 projection = glm::perspective(55.0f, width / (float)height, 0.1f, 100.0f);
