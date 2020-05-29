@@ -14,7 +14,7 @@
 #include "tigl.h"
 
 class MeshComponent 
-	: Component
+	: public Component
 {
 public:
 	MeshComponent()

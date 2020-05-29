@@ -122,12 +122,11 @@ void init()
 	
 	GameObject* pinguinObj = (*g_ptrMainScene->GetRootObject())["Pinguin"]; // Verkrijgen van het opgeslagen gameobject
     MeshComponent* c = Component::Instantiate<MeshComponent>(&ObjModel::load("Data/Models/Pinguin/PinguinBibber.obj"));
-	pinguinObj->AddComponent((Component*)c); // Het Toevoegen van een meshcomponent met data
+	pinguinObj->AddComponent(c); // Het Toevoegen van een meshcomponent met data
 
     colDectPenguin = Component::Instantiate<CollisionDetectionComponent>(); // Het aanmaken van een collision component
     colDectPenguin->initializeCollisionFrame(c->GetVertices()); // Het overgeven van de mesh data
-	pinguinObj->AddComponent((Component*)colDectPenguin); // Het toevoegen van de collision component
-
+	pinguinObj->AddComponent(colDectPenguin); // Het toevoegen van de collision component
 
     std::vector<Vertex> pincetModel = ObjModel::load("C:\\Users\\finni\\Documents\\Programming\\Project-Objects\\PincetV1.obj");
     meshComponentPincet = Component::Instantiate<MeshComponent>(&pincetModel);

@@ -3,7 +3,8 @@
 #include "ObjModel.h"
 
 #pragma once
-class CollisionDetectionComponent : Component
+class CollisionDetectionComponent 
+	: public Component
 {
 public:
 	CollisionDetectionComponent() : 

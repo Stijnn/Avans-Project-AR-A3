@@ -121,12 +121,14 @@ public:
 };
 
 template<typename T>
-inline T* GameObject::GetComponent()
+T* GameObject::GetComponent()
 {
-	for (auto& component : m_Components)
-		if (typeid(component) == typeid(T))
-			return (T*)component;
-
+	for (auto component : m_Components)
+	{
+		T* casted = dynamic_cast<T*>(component);
+		if (casted)
+			return casted;
+	}
 	return nullptr;
 }
 
