@@ -121,7 +121,7 @@ void init()
 	/// </summary>
 	
 	GameObject* pinguinObj = (*g_ptrMainScene->GetRootObject())["Pinguin"]; // Verkrijgen van het opgeslagen gameobject
-    MeshComponent* c = Component::Instantiate<MeshComponent>(&ObjModel::load("Data/Models/Pinguin/PinguinBibber.obj"));
+    MeshComponent* c = Component::Instantiate<MeshComponent>(&ObjModel::load("D:\\Avans\\Leerjaar 2\\Periode 4\\Project\\Avans-Project-AR-A3\\PingquinBibberV1.obj"));
 	pinguinObj->AddComponent((Component*)c); // Het Toevoegen van een meshcomponent met data
 
     colDectPenguin = Component::Instantiate<CollisionDetectionComponent>(); // Het aanmaken van een collision component
@@ -129,7 +129,7 @@ void init()
 	pinguinObj->AddComponent((Component*)colDectPenguin); // Het toevoegen van de collision component
 
 
-    std::vector<Vertex> pincetModel = ObjModel::load("C:\\Users\\finni\\Documents\\Programming\\Project-Objects\\PincetV1.obj");
+    std::vector<Vertex> pincetModel = ObjModel::load("D:\\Avans\\Leerjaar 2\\Periode 4\\Project\\Avans-Project-AR-A3\\PincetV1.obj");
     meshComponentPincet = Component::Instantiate<MeshComponent>(&pincetModel);
     colDect = Component::Instantiate<CollisionDetectionComponent>();
     colDect->setMeshScalingValue(0.1f);
