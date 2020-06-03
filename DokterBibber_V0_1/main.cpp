@@ -1,3 +1,27 @@
+#include "lib/imgui-1.76/imgui.h"
+#include "lib/imgui-1.76/examples/imgui_impl_glfw.h"
+#include "lib/imgui-1.76/examples/imgui_impl_opengl3.h"
+
+#if defined(IMGUI_IMPL_OPENGL_LOADER_GL3W)
+#include <GL/gl3w.h>
+#elif defined(IMGUI_IMPL_OPENGL_LOADER_GLEW)
+#include <GL/glew.h>
+#elif defined(IMGUI_IMPL_OPENGL_LOADER_GLAD)
+#include <glad/glad.h>
+#elif defined(IMGUI_IMPL_OPENGL_LOADER_GLBINDING2)
+#define GLFW_INCLUDE_NONE
+#include <glbinding/Binding.h>
+#include <glbinding/gl/gl.h>
+using namespace gl;
+#elif defined(IMGUI_IMPL_OPENGL_LOADER_GLBINDING3)
+#define GLFW_INCLUDE_NONE
+#include <glbinding/glbinding.h>
+#include <glbinding/gl/gl.h>
+using namespace gl;
+#else
+#include IMGUI_IMPL_OPENGL_LOADER_CUSTOM
+#endif
+
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include "tigl.h"
@@ -31,6 +55,10 @@ using tigl::Vertex;
 #include "FaceDetector.h"
 #include "FingerCount.h"
 
+#if defined(_MSC_VER) && (_MSC_VER >= 1900) && !defined(IMGUI_DISABLE_WIN32_FUNCTIONS)
+#pragma comment(lib, "legacy_stdio_definitions")
+#endif
+
 #pragma comment(lib, "glfw3.lib")
 #pragma comment(lib, "glew32s.lib")
 #pragma comment(lib, "opengl32.lib")
@@ -44,7 +72,7 @@ MeshComponent* meshComponentPincet;
 CollisionDetectionComponent* colDect; // a lose collision component
 CollisionDetectionComponent* colDectPenguin; // a lose collision component
 
-cv::VideoCapture cap(0);
+cv::VideoCapture cap(1);
 
 Scene* g_ptrMainScene;
 
@@ -53,7 +81,7 @@ GLuint textureId = -1;
 double duration;
 std::clock_t start;
 TextControl* textWriter;
-constexpr float sensivityScaler = 0.7;
+static float sensivityScaler = 0.1;
 constexpr float frameWidth = 1000 / 9;
 constexpr float frameHeight = 1000 / 16;
 
@@ -70,6 +98,16 @@ float yPosChange;
 
 cv::Mat frame, frameOut, handMask, foreground, fingerCountDebug;
 
+struct mat_texture_t
+{
+public:
+    const std::string& texture_name;
+    const GLuint& texture_id;
+    const cv::Mat& cv_mat;
+};
+
+std::list<mat_texture_t> open_cv_material_textures;
+
 BackgroundRemover backgroundRemover;
 SkinDetector skinDetector;
 FaceDetector faceDetector;
@@ -79,6 +117,7 @@ void init();
 void update();
 void draw();
 void cubes();
+void ongui();
 
 bool initCam();
 void BindCVMat2GLTexture(cv::Mat& image);
@@ -94,6 +133,18 @@ int main(void)
     if (!glfwInit())
         throw "Could not initialize glwf";
 
+#if __APPLE__
+    const char* glsl_version = "#version 150";
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);  // 3.2+ only
+    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);            // Required on Mac
+#else
+    const char* glsl_version = "#version 130";
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+#endif
+
     window = glfwCreateWindow(1920, 1080, "Dokter Bibber!", NULL, NULL);
 
     if (!window)
@@ -103,13 +154,43 @@ int main(void)
     }
     glfwMakeContextCurrent(window);
 
+#if defined(IMGUI_IMPL_OPENGL_LOADER_GL3W)
+    bool err = gl3wInit() != 0;
+#elif defined(IMGUI_IMPL_OPENGL_LOADER_GLEW)
+    bool err = glewInit() != GLEW_OK;
+#elif defined(IMGUI_IMPL_OPENGL_LOADER_GLAD)
+    bool err = gladLoadGL() == 0;
+#elif defined(IMGUI_IMPL_OPENGL_LOADER_GLBINDING2)
+    bool err = false;
+    glbinding::Binding::initialize();
+#elif defined(IMGUI_IMPL_OPENGL_LOADER_GLBINDING3)
+    bool err = false;
+    glbinding::initialize([](const char* name) { return (glbinding::ProcAddress)glfwGetProcAddress(name); });
+#else
+    bool err = false; // If you use IMGUI_IMPL_OPENGL_LOADER_CUSTOM, your loader is likely to requires some form of initialization.
+#endif
+    if (err)
+    {
+        glfwTerminate();
+        throw "Failed to initialize OpenGL loader!\n";
+    }
+
 	backgroundMusic = engine->play2D("backgroundHobbit.mp3", true, false, true);
+
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO(); (void)io;
+
+    ImGui_ImplGlfw_InitForOpenGL(window, true);
+    ImGui_ImplOpenGL3_Init(glsl_version);
 
     tigl::init();
 
     bool cameraAvailable = initCam();
     init();
+    ImGui::StyleColorsDark();
     
+    //open_cv_material_textures.push_back({"frame", BindCVMat2GLTexture()})
 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -160,10 +241,26 @@ int main(void)
                 
         }
 		update();
-		draw();
+
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+
+        ImGui::NewFrame();
+        ongui();
+        ImGui::Render();
+
+        draw();
+
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
+
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
+    ImGui::DestroyContext();
+
 	glfwTerminate();
 
     return 0;
@@ -334,6 +431,7 @@ void update()
     lastPosY = posY;
 }
 
+static bool wireframe_enabled = false;
 void draw()
 {
     int width, height;
@@ -343,6 +441,17 @@ void draw()
 
     glClearColor(0.3f, 0.4f, 0.6f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    if (wireframe_enabled)
+    {
+        glEnable(GL_POLYGON_MODE);
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    }
+    else
+    {
+        glDisable(GL_POLYGON_MODE);
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    }
 
     // timer
     std::stringstream buffer;
@@ -385,10 +494,10 @@ void draw()
    // tigl::shader->setViewMatrix(view);
 	tigl::shader->setViewMatrix(camera->getMatrix());
 
-    tigl::shader->enableTexture(true);
-    glBindTexture(GL_TEXTURE_2D, textureId);
-    showCameraScreen();
-    tigl::shader->enableTexture(false);
+    //tigl::shader->enableTexture(true);
+    //glBindTexture(GL_TEXTURE_2D, textureId);
+    //showCameraScreen();
+    //tigl::shader->enableTexture(false);
 
 	g_ptrMainScene->GetRootObject()->Draw();
 	cubes(); 
@@ -461,6 +570,65 @@ void cubes() {
 	tigl::addVertex(Vertex::PC(glm::vec3(1 + x, 1, 1 + z), glm::vec4(5, 1, -5, 0)));
 	tigl::addVertex(Vertex::PC(glm::vec3(1 + x, 1, -0.5 + z), glm::vec4(-5, 1, -5, 0)));
     tigl::end();
+}
+
+void ongui_tree_recursive(GameObject* go)
+{
+    if (ImGui::TreeNodeEx(go->GetName().c_str(), ImGuiTreeNodeFlags_::ImGuiTreeNodeFlags_Framed))
+    {
+        float positions[3] = { go->GetPosition().x, go->GetPosition().y, go->GetPosition().z };
+        if (ImGui::SliderFloat3("Position", positions, -100, 100))
+            go->SetPosition(glm::vec3(positions[0], positions[1], positions[2]));
+
+        float rotations[3] = { go->GetRotation().x, go->GetRotation().y, go->GetRotation().z };
+        if (ImGui::SliderFloat3("Rotation", rotations, -365, 365))
+            go->SetRotation(glm::vec3(rotations[0], rotations[1], rotations[2]));
+
+        float scaling[3] = { go->GetScale().x, go->GetScale().y, go->GetScale().z };
+        if (ImGui::SliderFloat3("Scale", scaling, -5, 5))
+            go->SetScale(glm::vec3(scaling[0], scaling[1], scaling[2]));
+
+        for (Component* comp : go->GetComponents())
+        {
+            if (ImGui::TreeNodeEx(comp->GetComponentName().c_str(), ImGuiTreeNodeFlags_::ImGuiTreeNodeFlags_Framed))
+            {
+                ImGui::TreePop();
+            }
+        }
+
+        for (GameObject* child : go->GetChildren())
+        {
+            ongui_tree_recursive(child);
+        }
+        ImGui::TreePop();
+    }
+}
+
+void ongui()
+{
+    if (ImGui::Begin("Debug"))
+    {
+        ImGui::SliderFloat("Sensitivity", &sensivityScaler, 0.0f, 5.0f);
+        ImGui::Checkbox("Wireframe Mode", &wireframe_enabled);
+
+        ImGui::Text("Display: (%.0fx%.0f)", ImGui::GetIO().DisplaySize.x, ImGui::GetIO().DisplaySize.y);
+        ImGui::Text("Framerate: %f", ImGui::GetIO().Framerate);
+        ImGui::Separator();
+        ImGui::BeginChild("Scrolling");
+        if (ImGui::TreeNode("Scene"))
+        {
+            ongui_tree_recursive(g_ptrMainScene->GetRootObject());
+            ImGui::TreePop();
+        }
+        ImGui::EndChild();
+    }
+    ImGui::End();
+
+    if (ImGui::Begin("Camera"))
+    {
+        ImGui::Image((void*)(intptr_t)textureId, ImVec2(512, 512));
+    }
+    ImGui::End();
 }
 
 bool initCam()
