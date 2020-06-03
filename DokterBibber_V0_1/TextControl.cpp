@@ -63,7 +63,6 @@ void TextControl::drawText(const std::string text, float xPos, float yPos)
 	tigl::shader->setModelMatrix(glm::mat4(1.0f));
 
 	tigl::shader->enableColor(false);
-	tigl::shader->enableLighting(false);
 	tigl::shader->enableTexture(true);
 	tigl::shader->enableColorMult(false);
 
@@ -88,7 +87,6 @@ void TextControl::drawText(const std::string text, float xPos, float yPos)
 	tigl::end();
 
 	tigl::shader->enableColor(true);
-	tigl::shader->enableLighting(false);
 	tigl::shader->enableTexture(false);
 	tigl::shader->enableColorMult(true);
 	glDisable(GL_BLEND);

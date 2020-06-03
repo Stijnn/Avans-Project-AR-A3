@@ -72,7 +72,7 @@ MeshComponent* meshComponentPincet;
 CollisionDetectionComponent* colDect; // a lose collision component
 CollisionDetectionComponent* colDectPenguin; // a lose collision component
 
-cv::VideoCapture cap(1);
+cv::VideoCapture cap(0);
 
 Scene* g_ptrMainScene;
 
@@ -215,8 +215,8 @@ int main(void)
             double dArea = oMoments.m00;
 
             //calculate the position of the ball
-            posX = dM10 / dArea;
-            posY = dM01 / dArea;
+            posX = (dM10 / dArea);
+            posY = (dM01 / dArea);
 
             if (iLastX >= 0 && iLastY >= 0 && posX >= 0 && posY >= 0)
             {
@@ -237,7 +237,7 @@ int main(void)
             if (key == 98) // b
                 backgroundRemover.calibrate(frame);
             else if (key == 115) // s            
-                skinDetector.calibrate(frame);         
+                skinDetector.calibrate(frame);        
                 
         }
 		update();
@@ -297,6 +297,14 @@ void init()
 		{
 			backgroundMusic->setIsPaused(!backgroundMusic->getIsPaused());
 		}
+        if (key == GLFW_KEY_PAGE_UP)
+        {
+            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL); // changes the cursor to normal
+        }
+        if (key == GLFW_KEY_PAGE_DOWN)
+        {
+            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN); // changes the cursor to hidden
+        }
     });
 
 	camera = new FpsCam(window);
@@ -315,7 +323,6 @@ void init()
 	GameObject* pinguinObj = (*g_ptrMainScene->GetRootObject())["Pinguin"]; // Verkrijgen van het opgeslagen gameobject
     MeshComponent* c = Component::Instantiate<MeshComponent>(&ObjModel::load("Data/Models/Pinguin/PinguinBibber.obj"));
 	pinguinObj->AddComponent(c); // Het Toevoegen van een meshcomponent met data
-    c->GetTransform()->SetRotation(glm::vec3(180, 0, 0));
 
     colDectPenguin = Component::Instantiate<CollisionDetectionComponent>(); // Het aanmaken van een collision component
     colDectPenguin->initializeCollisionFrame(c->GetVertices()); // Het overgeven van de mesh data
@@ -404,7 +411,6 @@ void init()
     tigl::shader->setLightDiffuse(0, glm::vec3(0.8f, 0.8f, 0.8f)); // diffuse color factor
     tigl::shader->setLightSpecular(0, glm::vec3(0, 0, 0)); // spotlight effect, and color
     tigl::shader->setShinyness(32.0f); // reflective factor
-
 }
 
 void update()
@@ -421,14 +427,30 @@ void update()
 
     //If(Game.IsGameOver()) {
         //If game is done, do something.
-        //To Reset, use Game.StartNewGame();
+        //To Reset, use Game.StartNewGame(); 
     //}
 
     xPosChange = posX - lastPosX;
     lastPosX = posX;
+    if (xPosChange < 1 ) // || xPosChange > -1
+    {
+
+    }
+    else
+    {
+        
+    }
 
     yPosChange = posY - lastPosY;
     lastPosY = posY;
+    if (yPosChange < 1 ) // || yPosChange > -1
+    {
+
+    }
+    else
+    {
+       
+    }    
 }
 
 static bool wireframe_enabled = false;
@@ -436,6 +458,11 @@ void draw()
 {
     int width, height;
     glfwGetWindowSize(window, &width, &height);
+
+    if (height < 1)
+    {
+        return;
+    }
 
     glViewport(0, 0, width, height);
 
@@ -464,13 +491,16 @@ void draw()
 
     textWriter->setScale(1.4f);
     textWriter->drawText(buffer.str(), 0, -800);
+
+    GameObject* pincetObj = (*g_ptrMainScene->GetRootObject())["Pincet"];
+    glm::vec3 pos = pincetObj->GetPosition();
+
     //std::string coordsXY("X: " + std::to_string(-mouse->getMouseXPos() * (sensivityScaler)) + ", coord Y: " + std::to_string(-mouse->getMouseYPos() * (sensivityScaler)));
-    std::string coordsXY("X: " + std::to_string(posX * (sensivityScaler)) + ", coord Y: " + std::to_string(posY * (sensivityScaler)));
+    std::string coordsXY("X: " + std::to_string((pos.x + xPosChange) * (sensivityScaler)) + ", Z: " + std::to_string((pos.z + yPosChange ) * (sensivityScaler)));
 
     // coord text
     textWriter->setScale(1.1f);
     textWriter->drawText(coordsXY, -2020, -1080);
-    tigl::shader->enableColor(true);
 
     // pincet movement
 
@@ -481,13 +511,12 @@ void draw()
 	/// 3 - Update Pos
 	/// 4 - Set Pos
 	/// </summary>
-	GameObject* pincetObj = (*g_ptrMainScene->GetRootObject())["Pincet"];
-	glm::vec3 pos = pincetObj->GetPosition();
+	
     //pos = glm::vec3(-mouse->getMouseXPos() * (sensivityScaler), 0, -mouse->getMouseYPos() * (sensivityScaler));
-    pos = glm::vec3((pos.x + xPosChange )* (sensivityScaler), 0, (pos.z + yPosChange) * (sensivityScaler));
+    pos = glm::vec3((pos.x + xPosChange )* (sensivityScaler), pos.y, (pos.z + yPosChange) * (sensivityScaler));
     pincetObj->SetPosition(pos);
 
-    glm::mat4 projection = glm::perspective(55.0f, width / (float)height, 0.1f, 100.0f);
+    glm::mat4 projection = glm::perspective(glm::radians(75.0f), width / (float)height, 0.1f, 100.0f);
     //glm::mat4 view = glm::lookAt(glm::vec3(-10.0f, 0,0), glm::vec3(0, 0, 0), glm::vec3(0, 1, -1.0f));
 
     tigl::shader->setProjectionMatrix(projection);
@@ -639,6 +668,11 @@ bool initCam()
         std::cout << "Cannot open the video cam" << std::endl;
         return false;
     }
+    glGenTextures(1, &textureId); // init
+    glBindTexture(GL_TEXTURE_2D, textureId);// one-time needed for init
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR); // init
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); // init
     return true;
 }
 
@@ -655,13 +689,9 @@ void showCameraScreen() {
 
 void BindCVMat2GLTexture(cv::Mat& image)
 {
-    glGenTextures(1, &textureId);
-    glBindTexture(GL_TEXTURE_2D, textureId);
+    glBindTexture(GL_TEXTURE_2D, textureId);// needed for every frame
 
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-    glTexImage2D(GL_TEXTURE_2D,
+    glTexImage2D(GL_TEXTURE_2D, // needed for every frame
         0,
         GL_RGB,
         image.cols,
