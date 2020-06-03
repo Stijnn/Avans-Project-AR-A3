@@ -11,7 +11,6 @@ FpsCam::FpsCam(GLFWwindow* window)
 		glfwSetInputMode(window, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
 }
 
-
 glm::mat4 FpsCam::getMatrix()
 {
 	glm::mat4 ret(1.0f);
@@ -24,16 +23,13 @@ glm::mat4 FpsCam::getMatrix()
 void FpsCam::move(float angle, float fac)
 {
 	position.x += (float)cos(rotation.y + glm::radians(angle)) * fac;
-	position.z += (float)sin(rotation.y + glm::radians(angle)) * fac;
-	
+	position.z += (float)sin(rotation.y + glm::radians(angle)) * fac;	
 }
 
 void FpsCam::setInit()
 {
-	setCamera(0, -15, 0);
+	setCamera(0, -15.0f, 0);
 }
-
-
 
 void FpsCam::setCamera(float x, float y, float z)
 {
@@ -42,12 +38,8 @@ void FpsCam::setCamera(float x, float y, float z)
 	position.z = z;
 }
 
-
-
 void FpsCam::update(GLFWwindow* window)
 {
-
-
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
 		setCamera(-1.5, -1, -0.3);
 	//bolletje

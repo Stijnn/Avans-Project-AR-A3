@@ -10,6 +10,7 @@
 #include <list>
 #include <glm/vec3.hpp>
 #include <string>
+#include <glm\ext\vector_float4.hpp>
 
 class Component;
 
@@ -23,7 +24,8 @@ private:
 		m_Parent	(a_GameObject.m_Parent),
 		m_Position	(a_GameObject.m_Position),
 		m_Rotation	(a_GameObject.m_Rotation),
-		m_Scale		(a_GameObject.m_Scale)
+		m_Scale		(a_GameObject.m_Scale),
+		m_Color		(a_GameObject.m_Color)
 	{};
 
 public:
@@ -76,6 +78,7 @@ protected:
 	glm::vec3				m_Rotation;
 	glm::vec3				m_Position;
 	glm::vec3				m_Scale;
+	glm::vec4				m_Color;
 
 protected:
 	//virtual void InternalUpdate	(float a_DeltaTime);
@@ -103,6 +106,7 @@ public:
 	inline const glm::vec3&	GetPosition	()	{ return m_Position; }
 	inline const glm::vec3&	GetRotation	()	{ return m_Rotation; }
 	inline const glm::vec3& GetScale	()	{ return m_Scale; }
+	inline const glm::vec4& GetColor	()	{ return m_Color; }
 
 	inline const std::list<	GameObject*	>&		GetChildren		()	const { return m_Children; }
 	inline const std::list<	Component*	>&		GetComponents	()	const { return m_Components; }
@@ -118,6 +122,9 @@ public:
 
 	inline void SetScale(const glm::vec3& newScale)
 		SMALL_SET(m_Scale, newScale)
+
+	inline void SetColor(const glm::vec4& newColor)
+		SMALL_SET(m_Color, newColor)
 };
 
 template<typename T>

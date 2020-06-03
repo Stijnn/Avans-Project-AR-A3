@@ -20,6 +20,8 @@ void MeshComponent::Draw()
 	modelMatrix = glm::scale(modelMatrix, glm::vec3(m_Transform->GetScale()[0], m_Transform->GetScale()[1], m_Transform->GetScale()[2]));
 
 	tigl::shader->setModelMatrix(modelMatrix);
+	tigl::shader->enableColor(true);
+	tigl::shader->enableTexture(false);
 	tigl::drawVertices(GL_TRIANGLES, m_Vertices);
 
 	/*tigl::begin(GL_TRIANGLES);

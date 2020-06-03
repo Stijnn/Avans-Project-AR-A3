@@ -2,8 +2,9 @@
 #include <algorithm>
 #include <glm\ext\matrix_transform.hpp>
 #include "MeshComponent.h"
+#include <iostream>
 
-void CollisionDetectionComponent::Initialize(void* a_Parameter)
+void CollisionDetectionComponent::Initialize(void* a_Parameter) 
 {
 
 }
@@ -14,23 +15,42 @@ void CollisionDetectionComponent::Update(float a_DeltaTime)
 	{
 		for (auto componentChild : objectChild->GetComponents())
 		{
-			std::string s = typeid(componentChild).raw_name();
-			std::string th = typeid(this).raw_name();
-			//MeshComponent* com = componentChild->GetTransform()->GetComponent<MeshComponent>();
-
-			bool isInstanceOfCDC = componentChild->GetComponentName() == typeid(CollisionDetectionComponent).name();
-			if (componentChild != nullptr && componentChild != this && isInstanceOfCDC)
+			CollisionDetectionComponent* colComp = componentChild->GetTransform()->GetComponent<CollisionDetectionComponent>();
+			if (colComp != nullptr && colComp != this && colComp->GetTransform()->GetName() != "Pincet") // makes sure to filter and catch any occurances with the pincet mesh
 			{
-				bool collisionX = this->m_Transform->GetPosition().x + this->xLength >= componentChild->GetTransform()->GetPosition().x &&
-					componentChild->GetTransform()->GetPosition().x + componentChild->GetTransform()->GetComponent<CollisionDetectionComponent>()->xLength >= this->m_Transform->GetPosition().x;
+				// for debugging				
+				float xMinGO = this->GetTransform()->GetPosition().x - (this->xLength / 2);
+				float xMaxSO = colComp->GetTransform()->GetPosition().x + (colComp->xLength / 2);
+				float xMaxGO = this->GetTransform()->GetPosition().x + (this->xLength / 2);
+				float xMinSO = colComp->GetTransform()->GetPosition().x - (colComp->xLength / 2);
 
-				//bool collisionY = this->m_Transform->GetPosition().y + this->yLength >= second_object->m_Transform->GetPosition().y &&
-				//	second_object->m_Transform->GetPosition().y + second_object->yLength >= this->m_Transform->GetPosition().y;
+ 				float yMinGO = this->GetTransform()->GetPosition().y - (this->yLength / 2);
+				float yMaxSO = colComp->GetTransform()->GetPosition().y + (colComp->yLength / 2);
+				float yMaxGO = this->GetTransform()->GetPosition().y + (this->yLength / 2);
+				float yMinSO = colComp->GetTransform()->GetPosition().y - (colComp->yLength / 2);
 
-			//	bool collisionZ = this->m_Transform->GetPosition().z + this->zLength >= second_object->m_Transform->GetPosition().z &&
-			//		second_object->m_Transform->GetPosition().z + second_object->zLength >= this->m_Transform->GetPosition().z;
+				float zMinGO = this->GetTransform()->GetPosition().z - (this->zLength / 2);
+				float zMaxSO = colComp->GetTransform()->GetPosition().z + (colComp->zLength / 2);
+				float zMaxGO = this->GetTransform()->GetPosition().z + (this->zLength / 2);
+				float zMinSO = colComp->GetTransform()->GetPosition().z - (colComp->zLength / 2);
 
-			//	bool CollisionOccured = collisionX && collisionY && collisionZ; // if there is collision on the object detect correctly
+				// collision logic
+				bool collisionX = xMinGO <= xMaxSO &&
+					xMaxGO >= xMinSO;
+
+				bool collisionY = yMinGO <= yMaxSO &&
+					yMaxGO >= yMinSO;
+
+				bool collisionZ = zMinGO <= zMaxSO &&
+					zMaxGO >= zMinSO;
+
+				// bool to check if sides x, y and z have collided
+				bool CollisionOccured = collisionX && collisionZ && collisionY; // if there is collision on the object detect correctly
+				if (CollisionOccured)
+				{
+					// debugging message for collision occurance
+					std::cout << "Collision Occured! with: " << colComp->GetTransform()->GetName() << std::endl;
+				}
 			}
 		}			
 	}
@@ -48,33 +68,12 @@ void CollisionDetectionComponent::Draw()
 	tigl::shader->setModelMatrix(modelMatrix);
 
 	// DEBUG
-	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	tigl::shader->enableTexture(false);
 	tigl::shader->enableColor(true);
+	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	tigl::drawVertices(GL_QUADS, this->collisionVerts);
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-}
-
-bool CollisionDetectionComponent::checkComponentCollision(const CollisionDetectionComponent& main_object, const CollisionDetectionComponent& second_object)
-{
-	/*bool collisionX = main_object.xMin <= second_object.xMax &&
-		main_object.xMax >= second_object.xMin;
-
-	bool collisionY = main_object.yMin <= second_object.yMax &&
-		main_object.yMax >= second_object.yMin;
-
-	bool collisionZ = main_object.zMin <= second_object.zMax &&
-		main_object.zMax >= second_object.zMin;*/
-
-	bool collisionX = main_object.m_Position.x + main_object.xLength >= second_object.m_Position.x &&
-		second_object.m_Position.x + second_object.xLength >= main_object.m_Position.x;
-
-	bool collisionY = main_object.m_Position.y + main_object.yLength >= second_object.m_Position.y &&
-		second_object.m_Position.y + second_object.yLength >= main_object.m_Position.y;
-
-	bool collisionZ = main_object.m_Position.z + main_object.zLength >= second_object.m_Position.z &&
-		second_object.m_Position.z + second_object.zLength >= main_object.m_Position.z;
-
-	return collisionX && collisionY && collisionZ; // if there is collision on the object detect correctly
+	tigl::shader->enableTexture(true);
 }
 
 std::vector<tigl::Vertex> CollisionDetectionComponent::getMeshVertexVector()
@@ -111,6 +110,10 @@ void CollisionDetectionComponent::initializeCollisionFrame(const std::vector<tig
 	this->zMin -= extrudeModifier;
 	this->zMax += extrudeModifier;
 
+	this->xLength = (this->xMax - this->xMin) * this->meshScalingValue;
+	this->yLength = (this->yMax - this->yMin) * this->meshScalingValue;
+	this->zLength = (this->zMax - this->zMin) * this->meshScalingValue;
+
 	buildCollisionFrame(glm::vec3((this->xLength / 2), (this->yLength + extrudeModifier) / 2, (this->zLength + extrudeModifier) / 2));
 }
 
@@ -133,29 +136,29 @@ void CollisionDetectionComponent::calculateMinMax(const std::vector<tigl::Vertex
 		temp = vert.position.x;
 		if (temp < this->xMin)
 		{
-			this->xMin = temp * meshScalingValue;
+			this->xMin = temp;
 		}
 		if (temp > this->xMax)
 		{
-			this->xMax = temp * meshScalingValue;
+			this->xMax = temp;
 		}
 		temp = vert.position.y;
 		if (temp < this->yMin)
 		{
-			this->yMin = temp * meshScalingValue;
+			this->yMin = temp;
 		}
 		if (temp > this->yMax)
 		{
-			this->yMax = temp * meshScalingValue;
+			this->yMax = temp;
 		}
 		temp = vert.position.z;
 		if (temp < this->zMin)
 		{
-			this->zMin = temp * meshScalingValue;
+			this->zMin = temp;
 		}
 		if (temp > this->zMax)
 		{
-			this->zMax = temp * meshScalingValue;
+			this->zMax = temp;
 		}
 	}
 }

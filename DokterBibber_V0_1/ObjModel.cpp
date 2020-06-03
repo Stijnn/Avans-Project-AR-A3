@@ -265,10 +265,10 @@ std::vector<tigl::Vertex> ObjModel::load(std::string fpath)
 			glm::vec3 norm = temp_normals[normalIndices[i] - 1];
 			glm::vec2 texc = temp_uvs[uvIndices[i] - 1];
 
-			modelVertices.push_back(tigl::Vertex::PTN(pos, texc, norm));
+			// TODO Remove color on texture binding
+			modelVertices.push_back(tigl::Vertex::PCTN(pos, glm::vec4(1,2,3,1), texc, norm));
 		}
 	}
-
 	return modelVertices;
 }
 
