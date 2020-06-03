@@ -184,7 +184,12 @@ void init()
         if (key == GLFW_KEY_ESCAPE)
             glfwSetWindowShouldClose(window, true);
         if (key == GLFW_KEY_HOME)
-            glfwSetCursorPos(window, 0, 0);       
+        {
+            GameObject* pincetObj = (*g_ptrMainScene->GetRootObject())["Pincet"];
+            pincetObj->SetPosition(glm::vec3(0, 0, 0));
+        }
+           
+            
         if (key == GLFW_KEY_N)        
             mouse->updateMouseMode(window, GLFW_CURSOR_NORMAL); // makes the mouse visible by pressing N
         if (key == GLFW_KEY_H)

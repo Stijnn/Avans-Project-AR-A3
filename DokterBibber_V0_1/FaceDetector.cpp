@@ -7,7 +7,7 @@
 
 Rect getFaceRect(Mat input);
 
-String faceClassifierFileName = "D:\\Avans\\Leerjaar 2\\Periode 4\\Project\\Avans-Project-AR-A3\\DokterBibber_V0_1\\Data\\haarcascade_frontalface_alt.xml";
+String faceClassifierFileName = "Data/haarcascade_frontalface_alt.xml";
 CascadeClassifier faceCascadeClassifier;
 
 FaceDetector::FaceDetector(void) {
