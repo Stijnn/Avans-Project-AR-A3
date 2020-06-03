@@ -307,6 +307,7 @@ void init()
     tigl::shader->setLightDiffuse(0, glm::vec3(0.8f, 0.8f, 0.8f)); // diffuse color factor
     tigl::shader->setLightSpecular(0, glm::vec3(0, 0, 0)); // spotlight effect, and color
     tigl::shader->setShinyness(32.0f); // reflective factor
+
 }
 
 void update()
