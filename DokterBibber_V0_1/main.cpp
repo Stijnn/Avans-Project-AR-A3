@@ -36,7 +36,6 @@ using tigl::Vertex;
 #pragma comment(lib, "opengl32.lib")
 #pragma comment(lib, "irrKlang.lib") // link with irrKlang.dll
 
-
 irrklang::ISoundEngine* engine;
 irrklang::ISound* backgroundMusic;
 
@@ -53,16 +52,21 @@ GLFWwindow* window;
 GLuint textureId = -1;
 double duration;
 std::clock_t start;
-static MouseControl* mouse;
 TextControl* textWriter;
-constexpr float sensivityScaler = 0.1;
+constexpr float sensivityScaler = 0.7;
 constexpr float frameWidth = 1000 / 9;
 constexpr float frameHeight = 1000 / 16;
 
 int iLastX;
 int iLastY;
+
 int posX;
 int posY;
+int lastPosY = 0;
+int lastPosX = 0;
+
+float xPosChange;
+float yPosChange;
 
 cv::Mat frame, frameOut, handMask, foreground, fingerCountDebug;
 
@@ -82,7 +86,6 @@ void showCameraScreen();
 
 int main(void)
 {
-
 	// start the sound engine with default parameters
 	engine = irrklang::createIrrKlangDevice();
 	if (!engine)
@@ -139,8 +142,8 @@ int main(void)
                 circle(frameOut, Point(posX, posY), 5, Scalar(255, 0, 255), 2, 8);
                 //Draw a red line from the previous point to the current point
                 //line(imgLines, Point(posX, posY), Point(iLastX, iLastY), Scalar(0, 0, 255), 2);
-            }
 
+            }
             imshow("output", frameOut);
             imshow("foreground", foreground);
             imshow("handMask", handMask);
@@ -152,8 +155,9 @@ int main(void)
 
             if (key == 98) // b
                 backgroundRemover.calibrate(frame);
-            else if (key == 115) // s
-                skinDetector.calibrate(frame);
+            else if (key == 115) // s            
+                skinDetector.calibrate(frame);         
+                
         }
 		update();
 		draw();
@@ -187,13 +191,7 @@ void init()
         {
             GameObject* pincetObj = (*g_ptrMainScene->GetRootObject())["Pincet"];
             pincetObj->SetPosition(glm::vec3(0, 0, 0));
-        }
-           
-            
-        if (key == GLFW_KEY_N)        
-            mouse->updateMouseMode(window, GLFW_CURSOR_NORMAL); // makes the mouse visible by pressing N
-        if (key == GLFW_KEY_H)
-            mouse->updateMouseMode(window, GLFW_CURSOR_DISABLED); // makes the mouse invisible by pressing H
+        }          
 		if (key == GLFW_KEY_SPACE)
 		{
 			engine->play2D("Buzzer.mp3", false);
@@ -208,7 +206,6 @@ void init()
 
 	//set camera to standard postion
 	camera->setInit(); 
-
 
     glEnable(GL_DEPTH_TEST);
 
@@ -299,7 +296,6 @@ void init()
     colDect->setMeshScalingValue(0.1f);
     colDect->initializeCollisionFrame(pincetModel);    */
 
-    mouse = new MouseControl(window, frameHeight, frameWidth, sensivityScaler);
     textWriter = new TextControl("C:/Windows/Fonts/times.ttf", 20, 1920.0f, 1080.0f);
 
     //inits the lighting 
@@ -311,13 +307,11 @@ void init()
     tigl::shader->setLightDiffuse(0, glm::vec3(0.8f, 0.8f, 0.8f)); // diffuse color factor
     tigl::shader->setLightSpecular(0, glm::vec3(0, 0, 0)); // spotlight effect, and color
     tigl::shader->setShinyness(32.0f); // reflective factor
-
 }
 
 void update()
 {    
 	camera->update(window);
-    mouse->updateMousePos(window);
 
 	g_ptrMainScene->GetRootObject()->Update(0);
 
@@ -331,6 +325,12 @@ void update()
         //If game is done, do something.
         //To Reset, use Game.StartNewGame();
     //}
+
+    xPosChange = posX - lastPosX;
+    lastPosX = posX;
+
+    yPosChange = posY - lastPosY;
+    lastPosY = posY;
 }
 
 void draw()
@@ -374,7 +374,7 @@ void draw()
 	GameObject* pincetObj = (*g_ptrMainScene->GetRootObject())["Pincet"];
 	glm::vec3 pos = pincetObj->GetPosition();
     //pos = glm::vec3(-mouse->getMouseXPos() * (sensivityScaler), 0, -mouse->getMouseYPos() * (sensivityScaler));
-    pos = glm::vec3(-posX * (sensivityScaler), 0, -posY * (sensivityScaler));
+    pos = glm::vec3((pos.x + xPosChange )* (sensivityScaler), 0, (pos.z + yPosChange) * (sensivityScaler));
     pincetObj->SetPosition(pos);
 
     glm::mat4 projection = glm::perspective(55.0f, width / (float)height, 0.1f, 100.0f);
