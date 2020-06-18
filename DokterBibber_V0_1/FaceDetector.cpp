@@ -47,5 +47,5 @@ Rect getFaceRect(Mat input) {
 	if (faceRectangles.size() > 0)
 		return faceRectangles[0];
 	else
-		return Rect(0, 0, 1, 1);
+		return Rect(0, 0, 1.5f, 1.5f);
 }

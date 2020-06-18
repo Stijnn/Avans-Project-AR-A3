@@ -138,6 +138,8 @@ Mat FingerCount::findFingersCount(Mat input_image, Mat frame) {
 	//polylines(contours_image, hull_points, true, color_blue);
 	//rectangle(contours_image, bounding_rectangle.tl(), bounding_rectangle.br(), color_red, 2, 8, 0);
 	circle(contours_image, center_bounding_rect, 5, color_purple, 2, 8);
+
+	this->position = center_bounding_rect;
 	//drawVectorPoints(contours_image, filtered_start_points, color_blue, true);
 	//drawVectorPoints(contours_image, filtered_far_points, color_red, true);
 	//drawVectorPoints(contours_image, filtered_finger_points, color_yellow, false);
@@ -285,4 +287,9 @@ void FingerCount::drawVectorPoints(Mat image, vector<Point> points, Scalar color
 		if(with_numbers)
 			putText(image, to_string(i), points[i], FONT_HERSHEY_PLAIN, 3, color);
 	}
+}
+
+Point FingerCount::getPosition()
+{
+	return position;
 }

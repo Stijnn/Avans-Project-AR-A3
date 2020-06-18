@@ -88,13 +88,15 @@ constexpr float frameHeight = 1000 / 16;
 int iLastX;
 int iLastY;
 
-int posX;
-int posY;
-int lastPosY = 0;
-int lastPosX = 0;
+float posX;
+float posY;
+float lastPosZ = 0.f;
+float lastPosX = 0.f;
 
 float xPosChange;
-float yPosChange;
+float zPosChange;
+
+float yPos;
 
 cv::Mat frame, frameOut, handMask, foreground, fingerCountDebug;
 
@@ -215,19 +217,19 @@ int main(void)
             double dArea = oMoments.m00;
 
             //calculate the position of the ball
-            posX = (dM10 / dArea);
-            posY = (dM01 / dArea);
+            posX = fingerCount.getPosition().x;
+            posY = fingerCount.getPosition().y;
 
             if (iLastX >= 0 && iLastY >= 0 && posX >= 0 && posY >= 0)
             {
                 circle(frameOut, Point(posX, posY), 5, Scalar(255, 0, 255), 2, 8);
                 //Draw a red line from the previous point to the current point
                 //line(imgLines, Point(posX, posY), Point(iLastX, iLastY), Scalar(0, 0, 255), 2);
-
             }
+
             imshow("output", frameOut);
-            imshow("foreground", foreground);
-            imshow("handMask", handMask);
+            //imshow("foreground", foreground);
+            //imshow("handMask", handMask);
             imshow("handDetection", fingerCountDebug);
 
             BindCVMat2GLTexture(frame);
@@ -287,7 +289,7 @@ void init()
         if (key == GLFW_KEY_HOME)
         {
             GameObject* pincetObj = (*g_ptrMainScene->GetRootObject())["Pincet"];
-            pincetObj->SetPosition(glm::vec3(0, 0, 0));
+            pincetObj->SetPosition(glm::vec3(0, 3, 0));
         }          
 		if (key == GLFW_KEY_SPACE)
 		{
@@ -305,6 +307,14 @@ void init()
         {
             glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN); // changes the cursor to hidden
         }
+        if (key == GLFW_KEY_UP)
+        {
+            yPos++; // incr. yPos
+        }
+        if (key == GLFW_KEY_DOWN)
+        {
+            yPos--; // decr. yPos
+        }
     });
 
 	camera = new FpsCam(window);
@@ -321,18 +331,20 @@ void init()
 	/// </summary>
 	
 	GameObject* pinguinObj = (*g_ptrMainScene->GetRootObject())["Pinguin"]; // Verkrijgen van het opgeslagen gameobject
-    MeshComponent* c = Component::Instantiate<MeshComponent>(&ObjModel::load("Data/Models/Pinguin/PinguinBibber.obj"));
-	pinguinObj->AddComponent(c); // Het Toevoegen van een meshcomponent met data
+    MeshComponent* penguinMesh = Component::Instantiate<MeshComponent>(&ObjModel::load("Data/Models/Pinguin/PinguinBibber.obj"));
+	pinguinObj->AddComponent(penguinMesh); // Het Toevoegen van een meshcomponent met data
+    penguinMesh->GetTransform()->SetScale(glm::vec3(1.5f));
 
     colDectPenguin = Component::Instantiate<CollisionDetectionComponent>(); // Het aanmaken van een collision component
-    colDectPenguin->initializeCollisionFrame(c->GetVertices()); // Het overgeven van de mesh data
+    colDectPenguin->initializeCollisionFrame(penguinMesh->GetVertices()); // Het overgeven van de mesh data
 	pinguinObj->AddComponent(colDectPenguin); // Het toevoegen van de collision component
 
     GameObject* pincetObj = (*g_ptrMainScene->GetRootObject())["Pincet"]; // Verkrijgen van het opgeslagen gameobject
     MeshComponent* pincetMesh = Component::Instantiate<MeshComponent>(&ObjModel::load("Data/Models/Pincet/Pincet.obj"));
     pincetObj->AddComponent(pincetMesh); // Het Toevoegen van een meshcomponent met data
-    pincetMesh->GetTransform()->SetScale(glm::vec3(0.1f));
-
+    pincetMesh->GetTransform()->SetScale(glm::vec3(0.05f));
+    pincetMesh->GetTransform()->SetRotation(glm::vec3(10,0,-85)); 
+     
     colDect = Component::Instantiate<CollisionDetectionComponent>(); // Het aanmaken van een collision component
     colDect->setMeshScalingValue(0.1f);
     colDect->initializeCollisionFrame(pincetMesh->GetVertices()); // Het overgeven van de mesh data
@@ -430,9 +442,10 @@ void update()
         //To Reset, use Game.StartNewGame(); 
     //}
 
+    // manages the position of the pincet
     xPosChange = posX - lastPosX;
     lastPosX = posX;
-    if (xPosChange < 1 ) // || xPosChange > -1
+    if (xPosChange < 1 )
     {
 
     }
@@ -440,10 +453,9 @@ void update()
     {
         
     }
-
-    yPosChange = posY - lastPosY;
-    lastPosY = posY;
-    if (yPosChange < 1 ) // || yPosChange > -1
+    zPosChange = posY - lastPosZ;
+    lastPosZ = posY;
+    if (zPosChange < 1 )
     {
 
     }
@@ -451,6 +463,8 @@ void update()
     {
        
     }    
+    xPosChange *= sensivityScaler; // adds the sensivity scaling to the Xpos, for finer movement
+    zPosChange *= sensivityScaler; // adds the sensivity scaling to the Zpos, for finer movement
 }
 
 static bool wireframe_enabled = false;
@@ -490,13 +504,14 @@ void draw()
         << ":" << int(seconds % 60);
 
     textWriter->setScale(1.4f);
-    textWriter->drawText(buffer.str(), 0, -800);
-
+    textWriter->drawText(buffer.str(), 0, -800);   
+    
     GameObject* pincetObj = (*g_ptrMainScene->GetRootObject())["Pincet"];
+    
     glm::vec3 pos = pincetObj->GetPosition();
 
     //std::string coordsXY("X: " + std::to_string(-mouse->getMouseXPos() * (sensivityScaler)) + ", coord Y: " + std::to_string(-mouse->getMouseYPos() * (sensivityScaler)));
-    std::string coordsXY("X: " + std::to_string((pos.x + xPosChange) * (sensivityScaler)) + ", Z: " + std::to_string((pos.z + yPosChange ) * (sensivityScaler)));
+    std::string coordsXY("X: " + std::to_string((pos.x + xPosChange)) + ", Z: " + std::to_string((pos.z + zPosChange )));
 
     // coord text
     textWriter->setScale(1.1f);
@@ -511,9 +526,11 @@ void draw()
 	/// 3 - Update Pos
 	/// 4 - Set Pos
 	/// </summary>
-	
-    //pos = glm::vec3(-mouse->getMouseXPos() * (sensivityScaler), 0, -mouse->getMouseYPos() * (sensivityScaler));
-    pos = glm::vec3((pos.x + xPosChange )* (sensivityScaler), pos.y, (pos.z + yPosChange) * (sensivityScaler));
+    
+    float posX = (pos.x + xPosChange);
+    float posZ = (pos.z + zPosChange);
+
+    pos = glm::vec3( (posX), yPos, (posZ));
     pincetObj->SetPosition(pos);
 
     glm::mat4 projection = glm::perspective(glm::radians(75.0f), width / (float)height, 0.1f, 100.0f);

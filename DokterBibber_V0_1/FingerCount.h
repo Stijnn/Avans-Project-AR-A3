@@ -13,6 +13,7 @@ class FingerCount {
 	public:
 		FingerCount(void);
 		Mat findFingersCount(Mat input_image, Mat frame);
+		Point getPosition();
 	
 	private:
 		Scalar color_blue;
@@ -29,4 +30,5 @@ class FingerCount {
 		vector<Point> findClosestOnX(vector<Point> points, Point pivot);
 		double findPointsDistanceOnX(Point a, Point b);
 		void drawVectorPoints(Mat image, vector<Point> points, Scalar color, bool with_numbers);
+		Point position;
 };
