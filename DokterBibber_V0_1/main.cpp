@@ -379,8 +379,8 @@ void init()
     pincetMesh->GetTransform()->SetRotation(glm::vec3(20,0,-85)); 
      
     colDect = Component::Instantiate<CollisionDetectionComponent>(); // Het aanmaken van een collision component
-    colDect->setMeshScalingValue(0.1f);
-    colDect->initializeCollisionFrame(pincetMesh->GetVertices()); // Het overgeven van de mesh data
+    //colDect->posOffSet = glm::vec3(0, -0.2f, 0);
+    colDect->initializeCollisionFrame(pincetMesh->GetVertices());
     pincetObj->AddComponent(colDect); // Het toevoegen van de collision component
 
     //Pick-up objecten
@@ -666,7 +666,7 @@ void ongui_tree_recursive(GameObject* go)
     {
         float positions[3] = { go->GetPosition().x, go->GetPosition().y, go->GetPosition().z };
         if (ImGui::SliderFloat3("Position", positions, -100, 100))
-            go->SetPosition(glm::vec3(positions[0], positions[1], positions[2]));
+            go->SetPosition(glm::vec3(positions[0] * 0.1f, positions[1] * 0.1f, positions[2] * 0.1f));
 
         float rotations[3] = { go->GetRotation().x, go->GetRotation().y, go->GetRotation().z };
         if (ImGui::SliderFloat3("Rotation", rotations, -365, 365))

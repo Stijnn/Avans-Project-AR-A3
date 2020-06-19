@@ -34,6 +34,22 @@ void CollisionDetectionComponent::Update(float a_DeltaTime)
 				float zMaxGO = this->GetTransform()->GetPosition().z + (this->zLength / 2);
 				float zMinSO = colComp->GetTransform()->GetPosition().z - (colComp->zLength / 2);
 
+				// 2nd method 
+				/*float xMinGO = this->GetTransform()->GetPosition().x - (this->xMin);
+				float xMaxSO = colComp->GetTransform()->GetPosition().x + (colComp->xMax);
+				float xMaxGO = this->GetTransform()->GetPosition().x + (this->xMax);
+				float xMinSO = colComp->GetTransform()->GetPosition().x - (colComp->xMin);
+
+				float yMinGO = this->GetTransform()->GetPosition().y - (this->yMin);
+				float yMaxSO = colComp->GetTransform()->GetPosition().y + (colComp->yMax);
+				float yMaxGO = this->GetTransform()->GetPosition().y + (this->yMax);
+				float yMinSO = colComp->GetTransform()->GetPosition().y - (colComp->yMin);
+
+				float zMinGO = this->GetTransform()->GetPosition().z - (this->zMin);
+				float zMaxSO = colComp->GetTransform()->GetPosition().z + (colComp->zMax);
+				float zMaxGO = this->GetTransform()->GetPosition().z + (this->zMax);
+				float zMinSO = colComp->GetTransform()->GetPosition().z - (colComp->zMin);*/
+
 				// collision logic
 				bool collisionX = xMinGO <= xMaxSO &&
 					xMaxGO >= xMinSO;
@@ -50,11 +66,14 @@ void CollisionDetectionComponent::Update(float a_DeltaTime)
 				{
 					// debugging message for collision occurance
 					std::cout << "Collision Occured! with: " << colComp->GetTransform()->GetName() << std::endl;
+
+					
 				}
 			}
 		}			
 	}
 }
+
 
 void CollisionDetectionComponent::Draw()
 {
@@ -97,24 +116,11 @@ void CollisionDetectionComponent::initializeCollisionFrame(const std::vector<tig
 
 	calculateMinMax(objectVerts);
 
-	this->xLength = this->xMax - this->xMin;
-	this->yLength = this->yMax - this->yMin;
-	this->zLength = this->zMax - this->zMin;
+	this->xLength = (this->xMax - this->xMin);
+	this->yLength = (this->yMax - this->yMin);
+	this->zLength = (this->zMax - this->zMin);
 
-	float extrudeModifier = (calculateExtrudeModifier(this->xLength, this->yLength, this->zLength) / this->extruderDivisionScaler);
-
-	this->xMin -= extrudeModifier;
-	this->xMax += extrudeModifier;
-	this->yMin -= extrudeModifier;
-	this->yMax += extrudeModifier;
-	this->zMin -= extrudeModifier;
-	this->zMax += extrudeModifier;
-
-	this->xLength = (this->xMax - this->xMin) * this->meshScalingValue;
-	this->yLength = (this->yMax - this->yMin) * this->meshScalingValue;
-	this->zLength = (this->zMax - this->zMin) * this->meshScalingValue;
-
-	buildCollisionFrame(glm::vec3((this->xLength / 2), (this->yLength + extrudeModifier) / 2, (this->zLength + extrudeModifier) / 2));
+	buildCollisionFrame();
 }
 
 void CollisionDetectionComponent::showCollisionFrame(bool showFrame)
@@ -163,41 +169,122 @@ void CollisionDetectionComponent::calculateMinMax(const std::vector<tigl::Vertex
 	}
 }
 
-void CollisionDetectionComponent::buildCollisionFrame(const glm::vec3 dimensions)
+void CollisionDetectionComponent::buildCollisionFrame()
 {
+	////bottom - wireframe
+	//this->collisionVerts.push_back(tigl::Vertex::PC(glm::vec3(this->xMin, this->yMin, this->zMin), glm::vec4(1, 0, 0, 1)));
+	//this->collisionVerts.push_back(tigl::Vertex::PC(glm::vec3(this->xMax, this->yMin, this->zMin), glm::vec4(0, 1, 0, 1)));
+	//this->collisionVerts.push_back(tigl::Vertex::PC(glm::vec3(this->xMax, this->yMin, this->zMax), glm::vec4(0, 0, 1, 1)));
+	//this->collisionVerts.push_back(tigl::Vertex::PC(glm::vec3(this->xMin, this->yMin, this->zMax), glm::vec4(0, 1, 1, 1)));
+
+	////top - wireframe
+	//this->collisionVerts.push_back(tigl::Vertex::PC(glm::vec3(this->xMin, this->yMax, this->zMin), glm::vec4(1, 0, 0, 1)));
+	//this->collisionVerts.push_back(tigl::Vertex::PC(glm::vec3(this->xMax, this->yMax, this->zMin), glm::vec4(0, 1, 0, 1)));
+	//this->collisionVerts.push_back(tigl::Vertex::PC(glm::vec3(this->xMax, this->yMax, this->zMax), glm::vec4(0, 0, 1, 1)));
+	//this->collisionVerts.push_back(tigl::Vertex::PC(glm::vec3(this->xMin, this->yMax, this->zMax), glm::vec4(0, 1, 1, 1)));
+
+	////left - wireframe
+	//this->collisionVerts.push_back(tigl::Vertex::PC(glm::vec3(this->xMax, this->yMin, this->zMin), glm::vec4(1, 0, 0, 1)));
+	//this->collisionVerts.push_back(tigl::Vertex::PC(glm::vec3(this->xMax, this->yMax, this->zMin), glm::vec4(0, 1, 0, 1)));
+	//this->collisionVerts.push_back(tigl::Vertex::PC(glm::vec3(this->xMax, this->yMax, this->zMax), glm::vec4(0, 0, 1, 1)));
+	//this->collisionVerts.push_back(tigl::Vertex::PC(glm::vec3(this->xMax, this->yMin, this->zMax), glm::vec4(0, 1, 1, 1)));
+
+	////right - wireframe
+	//this->collisionVerts.push_back(tigl::Vertex::PC(glm::vec3(this->xMin, this->yMin, this->zMin), glm::vec4(1, 0, 0, 1)));
+	//this->collisionVerts.push_back(tigl::Vertex::PC(glm::vec3(this->xMin, this->yMax, this->zMin), glm::vec4(1, 1, 1, 1)));
+	//this->collisionVerts.push_back(tigl::Vertex::PC(glm::vec3(this->xMin, this->yMax, this->zMax), glm::vec4(0, 0, 1, 1)));
+	//this->collisionVerts.push_back(tigl::Vertex::PC(glm::vec3(this->xMin, this->yMin, this->zMax), glm::vec4(0, 1, 1, 1)));
+
+	////back - wireframe
+	//this->collisionVerts.push_back(tigl::Vertex::PC(glm::vec3(this->xMin, this->yMin, this->zMin), glm::vec4(1, 0, 0, 1)));
+	//this->collisionVerts.push_back(tigl::Vertex::PC(glm::vec3(this->xMin, this->yMax, this->zMin), glm::vec4(0, 1, 0, 1)));
+	//this->collisionVerts.push_back(tigl::Vertex::PC(glm::vec3(this->xMax, this->yMax, this->zMin), glm::vec4(0, 0, 1, 1)));
+	//this->collisionVerts.push_back(tigl::Vertex::PC(glm::vec3(this->xMax, this->yMin, this->zMin), glm::vec4(0, 1, 1, 1)));
+
+	////front - wireframe
+	//this->collisionVerts.push_back(tigl::Vertex::PC(glm::vec3(this->xMin, this->yMin, this->zMax), glm::vec4(1, 0, 0, 1)));
+	//this->collisionVerts.push_back(tigl::Vertex::PC(glm::vec3(this->xMin, this->yMax, this->zMax), glm::vec4(0, 1, 0, 1)));
+	//this->collisionVerts.push_back(tigl::Vertex::PC(glm::vec3(this->xMax, this->yMax, this->zMax), glm::vec4(0, 0, 1, 1)));
+	//this->collisionVerts.push_back(tigl::Vertex::PC(glm::vec3(this->xMax, this->yMin, this->zMax), glm::vec4(0, 1, 1, 1)));
+
+	// REAL Wire Frame - used to check on the real wireframe check-up in the check on collision method
 	//bottom - wireframe
-	this->collisionVerts.push_back(tigl::Vertex::PC(glm::vec3(this->xMin, this->yMin, this->zMin), glm::vec4(1, 0, 0, 1)));
-	this->collisionVerts.push_back(tigl::Vertex::PC(glm::vec3(this->xMax, this->yMin, this->zMin), glm::vec4(0, 1, 0, 1)));
-	this->collisionVerts.push_back(tigl::Vertex::PC(glm::vec3(this->xMax, this->yMin, this->zMax), glm::vec4(0, 0, 1, 1)));
-	this->collisionVerts.push_back(tigl::Vertex::PC(glm::vec3(this->xMin, this->yMin, this->zMax), glm::vec4(0, 1, 1, 1)));
+	this->collisionVerts.push_back(tigl::Vertex::PC(glm::vec3(-this->xLength / 2, -this->yLength / 2, -this->zLength / 2) + posOffSet, glm::vec4(1, 0, 0, 1)));
+	this->collisionVerts.push_back(tigl::Vertex::PC(glm::vec3(this->xLength / 2, -this->yLength / 2, -this->zLength / 2) + posOffSet, glm::vec4(1, 0, 0, 1)));
+	this->collisionVerts.push_back(tigl::Vertex::PC(glm::vec3(this->xLength / 2, -this->yLength / 2, this->zLength / 2) + posOffSet, glm::vec4(1, 0, 0, 1)));
+	this->collisionVerts.push_back(tigl::Vertex::PC(glm::vec3(-this->xLength / 2, -this->yLength / 2, this->zLength / 2) + posOffSet, glm::vec4(1, 0, 0, 1)));
 
 	//top - wireframe
-	this->collisionVerts.push_back(tigl::Vertex::PC(glm::vec3(this->xMin, this->yMax, this->zMin), glm::vec4(1, 0, 0, 1)));
-	this->collisionVerts.push_back(tigl::Vertex::PC(glm::vec3(this->xMax, this->yMax, this->zMin), glm::vec4(0, 1, 0, 1)));
-	this->collisionVerts.push_back(tigl::Vertex::PC(glm::vec3(this->xMax, this->yMax, this->zMax), glm::vec4(0, 0, 1, 1)));
-	this->collisionVerts.push_back(tigl::Vertex::PC(glm::vec3(this->xMin, this->yMax, this->zMax), glm::vec4(0, 1, 1, 1)));
+	this->collisionVerts.push_back(tigl::Vertex::PC(glm::vec3(-this->xLength / 2, this->yLength / 2, -this->zLength / 2) + posOffSet, glm::vec4(1, 0, 0, 1)));
+	this->collisionVerts.push_back(tigl::Vertex::PC(glm::vec3(this->xLength / 2, this->yLength / 2, -this->zLength / 2) + posOffSet, glm::vec4(1, 0, 0, 1)));
+	this->collisionVerts.push_back(tigl::Vertex::PC(glm::vec3(this->xLength / 2, this->yLength / 2, this->zLength / 2) + posOffSet, glm::vec4(1, 0, 0, 1)));
+	this->collisionVerts.push_back(tigl::Vertex::PC(glm::vec3(-this->xLength / 2, this->yLength / 2, this->zLength / 2) + posOffSet, glm::vec4(1, 0, 0, 1)));
 
 	//left - wireframe
-	this->collisionVerts.push_back(tigl::Vertex::PC(glm::vec3(this->xMax, this->yMin, this->zMin), glm::vec4(1, 0, 0, 1)));
-	this->collisionVerts.push_back(tigl::Vertex::PC(glm::vec3(this->xMax, this->yMax, this->zMin), glm::vec4(0, 1, 0, 1)));
-	this->collisionVerts.push_back(tigl::Vertex::PC(glm::vec3(this->xMax, this->yMax, this->zMax), glm::vec4(0, 0, 1, 1)));
-	this->collisionVerts.push_back(tigl::Vertex::PC(glm::vec3(this->xMax, this->yMin, this->zMax), glm::vec4(0, 1, 1, 1)));
+	this->collisionVerts.push_back(tigl::Vertex::PC(glm::vec3(this->xLength / 2, -this->yLength / 2, -this->zLength / 2) + posOffSet, glm::vec4(1, 0, 0, 1)));
+	this->collisionVerts.push_back(tigl::Vertex::PC(glm::vec3(this->xLength / 2, this->yLength / 2, -this->zLength / 2) + posOffSet, glm::vec4(1, 0, 0, 1)));
+	this->collisionVerts.push_back(tigl::Vertex::PC(glm::vec3(this->xLength / 2, this->yLength / 2, this->zLength / 2) + posOffSet, glm::vec4(1, 0, 0, 1)));
+	this->collisionVerts.push_back(tigl::Vertex::PC(glm::vec3(this->xLength / 2, -this->yLength / 2, this->zLength / 2) + posOffSet, glm::vec4(1, 0, 0, 1)));
 
 	//right - wireframe
-	this->collisionVerts.push_back(tigl::Vertex::PC(glm::vec3(this->xMin, this->yMin, this->zMin), glm::vec4(1, 0, 0, 1)));
-	this->collisionVerts.push_back(tigl::Vertex::PC(glm::vec3(this->xMin, this->yMax, this->zMin), glm::vec4(1, 1, 1, 1)));
-	this->collisionVerts.push_back(tigl::Vertex::PC(glm::vec3(this->xMin, this->yMax, this->zMax), glm::vec4(0, 0, 1, 1)));
-	this->collisionVerts.push_back(tigl::Vertex::PC(glm::vec3(this->xMin, this->yMin, this->zMax), glm::vec4(0, 1, 1, 1)));
+	this->collisionVerts.push_back(tigl::Vertex::PC(glm::vec3(-this->xLength / 2, -this->yLength / 2, -this->zLength / 2) + posOffSet, glm::vec4(1, 0, 0, 1)));
+	this->collisionVerts.push_back(tigl::Vertex::PC(glm::vec3(-this->xLength / 2, this->yLength / 2, -this->zLength / 2) + posOffSet, glm::vec4(1, 0, 0, 1)));
+	this->collisionVerts.push_back(tigl::Vertex::PC(glm::vec3(-this->xLength / 2, this->yLength / 2, this->zLength / 2) + posOffSet, glm::vec4(1, 0, 0, 1)));
+	this->collisionVerts.push_back(tigl::Vertex::PC(glm::vec3(-this->xLength / 2, -this->yLength / 2, this->zLength / 2) + posOffSet, glm::vec4(1, 0, 0, 1)));
 
 	//back - wireframe
-	this->collisionVerts.push_back(tigl::Vertex::PC(glm::vec3(this->xMin, this->yMin, this->zMin), glm::vec4(1, 0, 0, 1)));
-	this->collisionVerts.push_back(tigl::Vertex::PC(glm::vec3(this->xMin, this->yMax, this->zMin), glm::vec4(0, 1, 0, 1)));
-	this->collisionVerts.push_back(tigl::Vertex::PC(glm::vec3(this->xMax, this->yMax, this->zMin), glm::vec4(0, 0, 1, 1)));
-	this->collisionVerts.push_back(tigl::Vertex::PC(glm::vec3(this->xMax, this->yMin, this->zMin), glm::vec4(0, 1, 1, 1)));
+	this->collisionVerts.push_back(tigl::Vertex::PC(glm::vec3(-this->xLength / 2, -this->yLength / 2, -this->zLength / 2) + posOffSet, glm::vec4(1, 0, 0, 1)));
+	this->collisionVerts.push_back(tigl::Vertex::PC(glm::vec3(-this->xLength / 2, this->yLength / 2, -this->zLength / 2) + posOffSet, glm::vec4(1, 0, 0, 1)));
+	this->collisionVerts.push_back(tigl::Vertex::PC(glm::vec3(this->xLength / 2, this->yLength / 2, -this->zLength / 2) + posOffSet, glm::vec4(1, 0, 0, 1)));
+	this->collisionVerts.push_back(tigl::Vertex::PC(glm::vec3(this->xLength / 2, -this->yLength / 2, -this->zLength / 2) + posOffSet, glm::vec4(1, 0, 0, 1)));
 
-	//front - wireframe
-	this->collisionVerts.push_back(tigl::Vertex::PC(glm::vec3(this->xMin, this->yMin, this->zMax), glm::vec4(1, 0, 0, 1)));
-	this->collisionVerts.push_back(tigl::Vertex::PC(glm::vec3(this->xMin, this->yMax, this->zMax), glm::vec4(0, 1, 0, 1)));
-	this->collisionVerts.push_back(tigl::Vertex::PC(glm::vec3(this->xMax, this->yMax, this->zMax), glm::vec4(0, 0, 1, 1)));
-	this->collisionVerts.push_back(tigl::Vertex::PC(glm::vec3(this->xMax, this->yMin, this->zMax), glm::vec4(0, 1, 1, 1)));
+	//front - 'REAL' wireframe
+	this->collisionVerts.push_back(tigl::Vertex::PC(glm::vec3(-this->xLength / 2, -this->yLength / 2, this->zLength / 2) + posOffSet, glm::vec4(1, 0, 0, 1)));
+	this->collisionVerts.push_back(tigl::Vertex::PC(glm::vec3(-this->xLength / 2, this->yLength / 2, this->zLength / 2) + posOffSet, glm::vec4(1, 0, 0, 1)));
+	this->collisionVerts.push_back(tigl::Vertex::PC(glm::vec3(this->xLength / 2, this->yLength / 2, this->zLength / 2) + posOffSet, glm::vec4(1, 0, 0, 1)));
+	this->collisionVerts.push_back(tigl::Vertex::PC(glm::vec3(this->xLength / 2, -this->yLength / 2, this->zLength / 2) + posOffSet, glm::vec4(1, 0, 0, 1)));
 }
+
+void CollisionDetectionComponent::buildPincetCollisionFrame(const glm::vec3 dimensions)
+{
+	this->xLength = dimensions.x;
+	this->yLength = dimensions.y;
+	this->zLength = dimensions.z;
+
+	//bottom - wireframe
+	this->collisionVerts.push_back(tigl::Vertex::PC(glm::vec3(-this->xLength / 2, -this->yLength / 2, -this->zLength / 2), glm::vec4(1, 0, 0, 1)));
+	this->collisionVerts.push_back(tigl::Vertex::PC(glm::vec3(this->xLength / 2, -this->yLength / 2, -this->zLength / 2), glm::vec4(1, 0, 0, 1)));
+	this->collisionVerts.push_back(tigl::Vertex::PC(glm::vec3(this->xLength / 2, -this->yLength / 2, this->zLength / 2), glm::vec4(1, 0, 0, 1)));
+	this->collisionVerts.push_back(tigl::Vertex::PC(glm::vec3(-this->xLength / 2, -this->yLength / 2, this->zLength / 2), glm::vec4(1, 0, 0, 1)));
+
+	//top - wireframe
+	this->collisionVerts.push_back(tigl::Vertex::PC(glm::vec3(-this->xLength / 2, this->yLength / 2, -this->zLength / 2), glm::vec4(1, 0, 0, 1)));
+	this->collisionVerts.push_back(tigl::Vertex::PC(glm::vec3(this->xLength / 2, this->yLength / 2, -this->zLength / 2), glm::vec4(1, 0, 0, 1)));
+	this->collisionVerts.push_back(tigl::Vertex::PC(glm::vec3(this->xLength / 2, this->yLength / 2, this->zLength / 2), glm::vec4(1, 0, 0, 1)));
+	this->collisionVerts.push_back(tigl::Vertex::PC(glm::vec3(-this->xLength / 2, this->yLength / 2, this->zLength / 2), glm::vec4(1, 0, 0, 1)));
+
+	//left - wireframe
+	this->collisionVerts.push_back(tigl::Vertex::PC(glm::vec3(this->xLength / 2, -this->yLength / 2, -this->zLength / 2), glm::vec4(1, 0, 0, 1)));
+	this->collisionVerts.push_back(tigl::Vertex::PC(glm::vec3(this->xLength / 2, this->yLength / 2, -this->zLength / 2), glm::vec4(1, 0, 0, 1)));
+	this->collisionVerts.push_back(tigl::Vertex::PC(glm::vec3(this->xLength / 2, this->yLength / 2, this->zLength / 2), glm::vec4(1, 0, 0, 1)));
+	this->collisionVerts.push_back(tigl::Vertex::PC(glm::vec3(this->xLength / 2, -this->yLength / 2, this->zLength / 2), glm::vec4(1, 0, 0, 1)));
+
+	//right - wireframe
+	this->collisionVerts.push_back(tigl::Vertex::PC(glm::vec3(-this->xLength / 2, -this->yLength / 2, -this->zLength / 2), glm::vec4(1, 0, 0, 1)));
+	this->collisionVerts.push_back(tigl::Vertex::PC(glm::vec3(-this->xLength / 2, this->yLength / 2, -this->zLength / 2), glm::vec4(1, 0, 0, 1)));
+	this->collisionVerts.push_back(tigl::Vertex::PC(glm::vec3(-this->xLength / 2, this->yLength / 2, this->zLength / 2), glm::vec4(1, 0, 0, 1)));
+	this->collisionVerts.push_back(tigl::Vertex::PC(glm::vec3(-this->xLength / 2, -this->yLength / 2, this->zLength / 2), glm::vec4(1, 0, 0, 1)));
+
+	//back - wireframe
+	this->collisionVerts.push_back(tigl::Vertex::PC(glm::vec3(-this->xLength / 2, -this->yLength / 2, -this->zLength / 2), glm::vec4(1, 0, 0, 1)));
+	this->collisionVerts.push_back(tigl::Vertex::PC(glm::vec3(-this->xLength / 2, this->yLength / 2, -this->zLength / 2), glm::vec4(1, 0, 0, 1)));
+	this->collisionVerts.push_back(tigl::Vertex::PC(glm::vec3(this->xLength / 2, this->yLength / 2, -this->zLength / 2), glm::vec4(1, 0, 0, 1)));
+	this->collisionVerts.push_back(tigl::Vertex::PC(glm::vec3(this->xLength / 2, -this->yLength / 2, -this->zLength / 2), glm::vec4(1, 0, 0, 1)));
+
+	//front - 'REAL' wireframe
+	this->collisionVerts.push_back(tigl::Vertex::PC(glm::vec3(-this->xLength / 2, -this->yLength / 2, this->zLength / 2), glm::vec4(1, 0, 0, 1)));
+	this->collisionVerts.push_back(tigl::Vertex::PC(glm::vec3(-this->xLength / 2, this->yLength / 2, this->zLength / 2), glm::vec4(1, 0, 0, 1)));
+	this->collisionVerts.push_back(tigl::Vertex::PC(glm::vec3(this->xLength / 2, this->yLength / 2, this->zLength / 2), glm::vec4(1, 0, 0, 1)));
+	this->collisionVerts.push_back(tigl::Vertex::PC(glm::vec3(this->xLength / 2, -this->yLength / 2, this->zLength / 2), glm::vec4(1, 0, 0, 1)));
+}
+

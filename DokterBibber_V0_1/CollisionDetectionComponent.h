@@ -1,6 +1,8 @@
 #include "Component.h"
 #include <vector>
 #include "ObjModel.h"
+#include <glm\ext\matrix_transform.hpp>
+#include <glm/glm.hpp>
 
 #pragma once
 class CollisionDetectionComponent 
@@ -18,12 +20,13 @@ public:
 	void initializeCollisionFrame(const std::vector<tigl::Vertex>& objectVerts);
 	std::vector<tigl::Vertex> getMeshVertexVector();
 	void setMeshScalingValue(const float scale);
+	void buildPincetCollisionFrame(const glm::vec3 dimensions);
 
 private:	
 	void showCollisionFrame(bool showFrame);
 	float calculateExtrudeModifier(const float& x, const float& y, const float& z);
 	void calculateMinMax(const std::vector<tigl::Vertex>& objectVerts);
-	void buildCollisionFrame(const glm::vec3 dimensions);
+	void buildCollisionFrame();
 
 private:
 	std::vector<tigl::Vertex> collisionVerts; // collisionVerts
@@ -42,6 +45,8 @@ public:
 	float xLength;
 	float yLength;
 	float zLength;
+
+	glm::vec3 posOffSet = glm::vec3(0.0f); // set the standard pos offset on zero
 
 
 private:
