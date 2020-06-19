@@ -194,6 +194,13 @@ int main(void)
     
     //open_cv_material_textures.push_back({"frame", BindCVMat2GLTexture()})
 
+    // KalmanFilter for smoothing the handmovement
+    KalmanFilter KF(4, 2, 0);
+    Mat_<float> state(4, 1); /* (x, y, Vx, Vy) */
+    Mat processNoise(4, 1, CV_32F);
+    Mat_<float> measurement(2, 1); measurement.setTo(Scalar(0));
+    char code = (char)-1;
+
 	while (!glfwWindowShouldClose(window))
 	{
         if (cameraAvailable) {
@@ -219,6 +226,33 @@ int main(void)
             //calculate the position of the ball
             posX = fingerCount.getPosition().x;
             posY = fingerCount.getPosition().y;
+
+            // KalmanFilter variable initilisation 
+            KF.statePre.at<float>(0) = posX;
+            KF.statePre.at<float>(1) = posY;
+            KF.statePre.at<float>(2) = 0;
+            KF.statePre.at<float>(3) = 0;
+            KF.transitionMatrix = (Mat_<float>(4, 4) << 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
+
+            setIdentity(KF.measurementMatrix);
+            setIdentity(KF.processNoiseCov, Scalar::all(1e-4));
+            setIdentity(KF.measurementNoiseCov, Scalar::all(1e-1));
+            setIdentity(KF.errorCovPost, Scalar::all(.1));
+
+            // KalmanFilter handmovement prediction and correction
+            Mat prediction = KF.predict();
+            Point predictPt(prediction.at<float>(0), prediction.at<float>(1));
+
+            measurement(0) = posX;
+            measurement(1) = posY;
+
+            Point measPt(measurement(0), measurement(1));
+
+            Mat estimated = KF.correct(measurement);
+            Point statePt(estimated.at<float>(0), estimated.at<float>(1));
+
+            posX = statePt.x;
+            posY = statePt.y;
 
             if (iLastX >= 0 && iLastY >= 0 && posX >= 0 && posY >= 0)
             {
@@ -309,11 +343,11 @@ void init()
         }
         if (key == GLFW_KEY_UP)
         {
-            yPos++; // incr. yPos
+            yPos+=0.1; // incr. yPos
         }
         if (key == GLFW_KEY_DOWN)
         {
-            yPos--; // decr. yPos
+            yPos-=0.1; // decr. yPos
         }
     });
 
@@ -341,8 +375,8 @@ void init()
     GameObject* pincetObj = (*g_ptrMainScene->GetRootObject())["Pincet"]; // Verkrijgen van het opgeslagen gameobject
     MeshComponent* pincetMesh = Component::Instantiate<MeshComponent>(&ObjModel::load("Data/Models/Pincet/Pincet.obj"));
     pincetObj->AddComponent(pincetMesh); // Het Toevoegen van een meshcomponent met data
-    pincetMesh->GetTransform()->SetScale(glm::vec3(0.02f));
-    pincetMesh->GetTransform()->SetRotation(glm::vec3(10,0,-85)); 
+    pincetMesh->GetTransform()->SetScale(glm::vec3(0.01f));
+    pincetMesh->GetTransform()->SetRotation(glm::vec3(20,0,-85)); 
      
     colDect = Component::Instantiate<CollisionDetectionComponent>(); // Het aanmaken van een collision component
     colDect->setMeshScalingValue(0.1f);

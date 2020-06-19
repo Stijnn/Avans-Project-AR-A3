@@ -63,7 +63,7 @@ void FpsCam::update(GLFWwindow* window, GameObject& pincet)
 
 	if (this->isCameraTrackOn) // follows the pincet on a zoomed in view
 	{
-		pincetView = glm::lookAt(pincet.GetPosition(),glm::vec3(pincet.GetPosition().x, -2 , pincet.GetPosition().z), glm::vec3(0, 1, -1.0f));
+		pincetView = glm::lookAt(glm::vec3(pincet.GetPosition().x + 0.1, pincet.GetPosition().y, pincet.GetPosition().z + 0.1), glm::vec3(pincet.GetPosition().x, -2 , pincet.GetPosition().z), glm::vec3(0, 1, -1.0f));
 	}
 	else // zooms out to the penguin
 	{
