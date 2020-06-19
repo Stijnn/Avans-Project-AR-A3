@@ -85,8 +85,8 @@ static float sensivityScaler = 0.1;
 constexpr float frameWidth = 1000 / 9;
 constexpr float frameHeight = 1000 / 16;
 
-int iLastX;
-int iLastY;
+float iLastX;
+float iLastY;
 
 float posX;
 float posY;
@@ -333,7 +333,6 @@ void init()
 	GameObject* pinguinObj = (*g_ptrMainScene->GetRootObject())["Pinguin"]; // Verkrijgen van het opgeslagen gameobject
     MeshComponent* penguinMesh = Component::Instantiate<MeshComponent>(&ObjModel::load("Data/Models/Pinguin/PinguinBibber.obj"));
 	pinguinObj->AddComponent(penguinMesh); // Het Toevoegen van een meshcomponent met data
-    penguinMesh->GetTransform()->SetScale(glm::vec3(1.5f));
 
     colDectPenguin = Component::Instantiate<CollisionDetectionComponent>(); // Het aanmaken van een collision component
     colDectPenguin->initializeCollisionFrame(penguinMesh->GetVertices()); // Het overgeven van de mesh data
@@ -342,7 +341,7 @@ void init()
     GameObject* pincetObj = (*g_ptrMainScene->GetRootObject())["Pincet"]; // Verkrijgen van het opgeslagen gameobject
     MeshComponent* pincetMesh = Component::Instantiate<MeshComponent>(&ObjModel::load("Data/Models/Pincet/Pincet.obj"));
     pincetObj->AddComponent(pincetMesh); // Het Toevoegen van een meshcomponent met data
-    pincetMesh->GetTransform()->SetScale(glm::vec3(0.05f));
+    pincetMesh->GetTransform()->SetScale(glm::vec3(0.02f));
     pincetMesh->GetTransform()->SetRotation(glm::vec3(10,0,-85)); 
      
     colDect = Component::Instantiate<CollisionDetectionComponent>(); // Het aanmaken van een collision component
@@ -426,9 +425,7 @@ void init()
 }
 
 void update()
-{    
-	camera->update(window);
-
+{      
 	g_ptrMainScene->GetRootObject()->Update(0);
 
     duration = (std::clock() - start) / (double)CLOCKS_PER_SEC;
@@ -465,6 +462,10 @@ void update()
     }    
     xPosChange *= sensivityScaler; // adds the sensivity scaling to the Xpos, for finer movement
     zPosChange *= sensivityScaler; // adds the sensivity scaling to the Zpos, for finer movement
+
+    GameObject* pincetObj = (*g_ptrMainScene->GetRootObject())["Pincet"];
+
+    camera->update(window, *pincetObj);
 }
 
 static bool wireframe_enabled = false;
@@ -509,8 +510,6 @@ void draw()
     GameObject* pincetObj = (*g_ptrMainScene->GetRootObject())["Pincet"];
     
     glm::vec3 pos = pincetObj->GetPosition();
-
-    //std::string coordsXY("X: " + std::to_string(-mouse->getMouseXPos() * (sensivityScaler)) + ", coord Y: " + std::to_string(-mouse->getMouseYPos() * (sensivityScaler)));
     std::string coordsXY("X: " + std::to_string((pos.x + xPosChange)) + ", Z: " + std::to_string((pos.z + zPosChange )));
 
     // coord text
@@ -534,11 +533,20 @@ void draw()
     pincetObj->SetPosition(pos);
 
     glm::mat4 projection = glm::perspective(glm::radians(75.0f), width / (float)height, 0.1f, 100.0f);
-    //glm::mat4 view = glm::lookAt(glm::vec3(-10.0f, 0,0), glm::vec3(0, 0, 0), glm::vec3(0, 1, -1.0f));
 
     tigl::shader->setProjectionMatrix(projection);
    // tigl::shader->setViewMatrix(view);
-	tigl::shader->setViewMatrix(camera->getMatrix());
+
+    if (camera->cameraPincetTrackingOn())
+    {
+        tigl::shader->setViewMatrix(camera->getPincetCamera());
+        sensivityScaler = 0.02f;
+    }
+    else
+    {
+        tigl::shader->setViewMatrix(camera->getMatrix());
+        sensivityScaler = 0.1f;
+    }
 
     //tigl::shader->enableTexture(true);
     //glBindTexture(GL_TEXTURE_2D, textureId);
