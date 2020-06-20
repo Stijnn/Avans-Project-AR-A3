@@ -100,6 +100,7 @@ float yPos;
 
 cv::Mat frame, frameOut, handMask, foreground, fingerCountDebug;
 
+
 struct mat_texture_t
 {
 public:
@@ -124,6 +125,9 @@ void ongui();
 bool initCam();
 void BindCVMat2GLTexture(cv::Mat& image);
 void showCameraScreen();
+
+GameObject* toFollow;
+glm::vec3 toFollowPosModifier;
 
 int main(void)
 {
@@ -309,12 +313,12 @@ void init()
 	g_ptrMainScene = new Scene();
 	g_ptrMainScene->GetRootObject()->AddChild(GameObject::Instantiate("Pinguin"));
 	g_ptrMainScene->GetRootObject()->AddChild(GameObject::Instantiate("Pincet"));
-    //g_ptrMainScene->GetRootObject()->AddChild(GameObject::Instantiate("Bone"));
-    //g_ptrMainScene->GetRootObject()->AddChild(GameObject::Instantiate("Heart"));
+    g_ptrMainScene->GetRootObject()->AddChild(GameObject::Instantiate("Bone"));
+    g_ptrMainScene->GetRootObject()->AddChild(GameObject::Instantiate("Heart"));
     ////g_ptrMainScene->GetRootObject()->AddChild(GameObject::Instantiate("Gun"));
-    //g_ptrMainScene->GetRootObject()->AddChild(GameObject::Instantiate("Circle"));
-    //g_ptrMainScene->GetRootObject()->AddChild(GameObject::Instantiate("Triangle"));
-    //g_ptrMainScene->GetRootObject()->AddChild(GameObject::Instantiate("Monkey"));
+    g_ptrMainScene->GetRootObject()->AddChild(GameObject::Instantiate("Circle"));
+    g_ptrMainScene->GetRootObject()->AddChild(GameObject::Instantiate("Triangle"));
+    g_ptrMainScene->GetRootObject()->AddChild(GameObject::Instantiate("Monkey"));
 
     glfwSetKeyCallback(window, [](GLFWwindow* window, int key, int scancode, int action, int mods)
     {
@@ -349,6 +353,47 @@ void init()
         {
             yPos-=0.1; // decr. yPos
         }
+
+        if (key == GLFW_KEY_1)
+        {
+            cout << "Key 1 pressed!" << endl;
+            toFollow = (*g_ptrMainScene->GetRootObject())["Heart"];
+            GameObject* pincetObj = (*g_ptrMainScene->GetRootObject())["Pincet"];
+            toFollow->SetRotation(pincetObj->GetRotation());
+            toFollowPosModifier = glm::vec3(0, 0.5, 0);
+        }
+        else if (key == GLFW_KEY_2)
+        {
+            cout << "Key 2 pressed!" << endl;
+            toFollow = (*g_ptrMainScene->GetRootObject())["Bone"];
+            GameObject* pincetObj = (*g_ptrMainScene->GetRootObject())["Pincet"];
+            toFollow->SetRotation(pincetObj->GetRotation());
+            toFollowPosModifier = glm::vec3(0, 1.65, -1);
+        }
+        else if (key == GLFW_KEY_3)
+        {
+            cout << "Key 3 pressed!" << endl;
+            toFollow = (*g_ptrMainScene->GetRootObject())["Circle"];
+            GameObject* pincetObj = (*g_ptrMainScene->GetRootObject())["Pincet"];
+            toFollow->SetRotation(pincetObj->GetRotation());
+            toFollowPosModifier = glm::vec3(0.15, 1.25, -2.5);
+        }
+        else if (key == GLFW_KEY_4)
+        {
+            cout << "Key 4 pressed!" << endl;
+            toFollow = (*g_ptrMainScene->GetRootObject())["Monkey"];
+            GameObject* pincetObj = (*g_ptrMainScene->GetRootObject())["Pincet"];
+            toFollow->SetRotation(pincetObj->GetRotation());
+            toFollowPosModifier = glm::vec3(0.25, -2, -0.5);
+        }
+        else if (key == GLFW_KEY_5)
+        {
+            cout << "Key 5 pressed!" << endl;
+            toFollow = (*g_ptrMainScene->GetRootObject())["Triangle"];
+            GameObject* pincetObj = (*g_ptrMainScene->GetRootObject())["Pincet"];
+            toFollow->SetRotation(pincetObj->GetRotation());
+            toFollowPosModifier = glm::vec3(0.25, -2.5, -2.25);
+        }
     });
 
 	camera = new FpsCam(window);
@@ -368,9 +413,9 @@ void init()
     MeshComponent* penguinMesh = Component::Instantiate<MeshComponent>(&ObjModel::load("Data/Models/Pinguin/PinguinBibber.obj"));
 	pinguinObj->AddComponent(penguinMesh); // Het Toevoegen van een meshcomponent met data
 
-    colDectPenguin = Component::Instantiate<CollisionDetectionComponent>(); // Het aanmaken van een collision component
-    colDectPenguin->initializeCollisionFrame(penguinMesh->GetVertices()); // Het overgeven van de mesh data
-	pinguinObj->AddComponent(colDectPenguin); // Het toevoegen van de collision component
+    //colDectPenguin = Component::Instantiate<CollisionDetectionComponent>(); // Het aanmaken van een collision component
+    //colDectPenguin->initializeCollisionFrame(penguinMesh->GetVertices()); // Het overgeven van de mesh data
+	//pinguinObj->AddComponent(colDectPenguin); // Het toevoegen van de collision component
 
     GameObject* pincetObj = (*g_ptrMainScene->GetRootObject())["Pincet"]; // Verkrijgen van het opgeslagen gameobject
     MeshComponent* pincetMesh = Component::Instantiate<MeshComponent>(&ObjModel::load("Data/Models/Pincet/Pincet.obj"));
@@ -378,62 +423,62 @@ void init()
     pincetMesh->GetTransform()->SetScale(glm::vec3(0.01f));
     pincetMesh->GetTransform()->SetRotation(glm::vec3(20,0,-85)); 
      
-    colDect = Component::Instantiate<CollisionDetectionComponent>(); // Het aanmaken van een collision component
+    //colDect = Component::Instantiate<CollisionDetectionComponent>(); // Het aanmaken van een collision component
     //colDect->posOffSet = glm::vec3(0, -0.2f, 0);
-    colDect->initializeCollisionFrame(pincetMesh->GetVertices());
-    pincetObj->AddComponent(colDect); // Het toevoegen van de collision component
+    //colDect->initializeCollisionFrame(pincetMesh->GetVertices());
+    //pincetObj->AddComponent(colDect); // Het toevoegen van de collision component
 
     //Pick-up objecten
 
     ////Bone
-    //GameObject* BoneObj = (*g_ptrMainScene->GetRootObject())["Bone"]; // Verkrijgen van het opgeslagen gameobject
-    //MeshComponent* BoneMesh = Component::Instantiate<MeshComponent>(&ObjModel::load("Data/Models/Pickup/PingquinBibberBoneobj.obj"));
-    //BoneObj->AddComponent(BoneMesh); // Het Toevoegen van een meshcomponent met data
+    GameObject* BoneObj = (*g_ptrMainScene->GetRootObject())["Bone"]; // Verkrijgen van het opgeslagen gameobject
+    MeshComponent* BoneMesh = Component::Instantiate<MeshComponent>(&ObjModel::load("Data/Models/Pickup/PingquinBibberBoneobj.obj"));
+    BoneObj->AddComponent(BoneMesh); // Het Toevoegen van een meshcomponent met data
 
     //colDect = Component::Instantiate<CollisionDetectionComponent>(); // Het aanmaken van een collision component
     //colDect->initializeCollisionFrame(BoneMesh->GetVertices()); // Het overgeven van de mesh data
     //BoneObj->AddComponent(colDect); // Het toevoegen van de collision component
 
     ////Heart
-    //GameObject* HeartObj = (*g_ptrMainScene->GetRootObject())["Heart"]; // Verkrijgen van het opgeslagen gameobject
-    //MeshComponent* HeartMesh = Component::Instantiate<MeshComponent>(&ObjModel::load("Data/Models/Pickup/PingquinBibberHeart.obj"));
-    //HeartObj->AddComponent(HeartMesh); // Het Toevoegen van een meshcomponent met data
+    GameObject* HeartObj = (*g_ptrMainScene->GetRootObject())["Heart"]; // Verkrijgen van het opgeslagen gameobject
+    MeshComponent* HeartMesh = Component::Instantiate<MeshComponent>(&ObjModel::load("Data/Models/Pickup/PingquinBibberHeart.obj"));
+    HeartObj->AddComponent(HeartMesh); // Het Toevoegen van een meshcomponent met data
 
     //colDect = Component::Instantiate<CollisionDetectionComponent>(); // Het aanmaken van een collision component
     //colDect->initializeCollisionFrame(HeartMesh->GetVertices()); // Het overgeven van de mesh data
     //HeartObj->AddComponent(colDect); // Het toevoegen van de collision component
 
     ////Circle
-    //GameObject* CircleObj = (*g_ptrMainScene->GetRootObject())["Circle"]; // Verkrijgen van het opgeslagen gameobject
-    //MeshComponent* CircleMesh = Component::Instantiate<MeshComponent>(&ObjModel::load("Data/Models/Pickup/PingquinBibberCircle.obj"));
-    //CircleObj->AddComponent(CircleMesh); // Het Toevoegen van een meshcomponent met data
+    GameObject* CircleObj = (*g_ptrMainScene->GetRootObject())["Circle"]; // Verkrijgen van het opgeslagen gameobject
+    MeshComponent* CircleMesh = Component::Instantiate<MeshComponent>(&ObjModel::load("Data/Models/Pickup/PingquinBibberCircle.obj"));
+    CircleObj->AddComponent(CircleMesh); // Het Toevoegen van een meshcomponent met data
 
     //colDect = Component::Instantiate<CollisionDetectionComponent>(); // Het aanmaken van een collision component
     //colDect->initializeCollisionFrame(CircleMesh->GetVertices()); // Het overgeven van de mesh data
     //CircleObj->AddComponent(colDect); // Het toevoegen van de collision component
 
     ////Gun
-    ////GameObject* GunObj = (*g_ptrMainScene->GetRootObject())["Gun"]; // Verkrijgen van het opgeslagen gameobject
+    //GameObject* GunObj = (*g_ptrMainScene->GetRootObject())["Gun"]; // Verkrijgen van het opgeslagen gameobject
     ////MeshComponent* GunMesh = Component::Instantiate<MeshComponent>(&ObjModel::load("Data/Models/Pickup/PingquinBibberGun.obj"));
     ////GunObj->AddComponent(GunMesh); // Het Toevoegen van een meshcomponent met data
 
-    ////colDect = Component::Instantiate<CollisionDetectionComponent>(); // Het aanmaken van een collision component
+    ///colDect = Component::Instantiate<CollisionDetectionComponent>(); // Het aanmaken van een collision component
     ////colDect->initializeCollisionFrame(GunMesh->GetVertices()); // Het overgeven van de mesh data
     ////GunObj->AddComponent(colDect); // Het toevoegen van de collision component
 
     ////Monkey
-    //GameObject* MonkeyObj = (*g_ptrMainScene->GetRootObject())["Monkey"]; // Verkrijgen van het opgeslagen gameobject
-    //MeshComponent* MonkeyMesh = Component::Instantiate<MeshComponent>(&ObjModel::load("Data/Models/Pickup/PingquinBibberMonkey.obj"));
-    //MonkeyObj->AddComponent(MonkeyMesh); // Het Toevoegen van een meshcomponent met data
+    GameObject* MonkeyObj = (*g_ptrMainScene->GetRootObject())["Monkey"]; // Verkrijgen van het opgeslagen gameobject
+    MeshComponent* MonkeyMesh = Component::Instantiate<MeshComponent>(&ObjModel::load("Data/Models/Pickup/PingquinBibberMonkey.obj"));
+    MonkeyObj->AddComponent(MonkeyMesh); // Het Toevoegen van een meshcomponent met data
 
     //colDect = Component::Instantiate<CollisionDetectionComponent>(); // Het aanmaken van een collision component
     //colDect->initializeCollisionFrame(MonkeyMesh->GetVertices()); // Het overgeven van de mesh data
     //MonkeyObj->AddComponent(colDect); // Het toevoegen van de collision component
 
     ////triangle
-    //GameObject* TriangleObj = (*g_ptrMainScene->GetRootObject())["Triangle"]; // Verkrijgen van het opgeslagen gameobject
-    //MeshComponent* TriangleMesh = Component::Instantiate<MeshComponent>(&ObjModel::load("Data/Models/Pickup/PingquinBibberTriangle.obj"));
-    //TriangleObj->AddComponent(TriangleMesh); // Het Toevoegen van een meshcomponent met data
+    GameObject* TriangleObj = (*g_ptrMainScene->GetRootObject())["Triangle"]; // Verkrijgen van het opgeslagen gameobject
+    MeshComponent* TriangleMesh = Component::Instantiate<MeshComponent>(&ObjModel::load("Data/Models/Pickup/PingquinBibberTriangle.obj"));
+    TriangleObj->AddComponent(TriangleMesh); // Het Toevoegen van een meshcomponent met data
 
     //colDect = Component::Instantiate<CollisionDetectionComponent>(); // Het aanmaken van een collision component
     //colDect->initializeCollisionFrame(TriangleMesh->GetVertices()); // Het overgeven van de mesh data
@@ -500,6 +545,10 @@ void update()
     GameObject* pincetObj = (*g_ptrMainScene->GetRootObject())["Pincet"];
 
     camera->update(window, *pincetObj);
+
+    if (toFollow != NULL) {
+        camera->update(window, *toFollow);
+    }
 }
 
 static bool wireframe_enabled = false;
@@ -565,6 +614,10 @@ void draw()
 
     pos = glm::vec3( (posX), yPos, (posZ));
     pincetObj->SetPosition(pos);
+
+    if (toFollow != NULL) {
+        toFollow->SetPosition(glm::vec3(pos.x + toFollowPosModifier.x, pos.y + toFollowPosModifier.y, pos.z + toFollowPosModifier.z));
+    }
 
     glm::mat4 projection = glm::perspective(glm::radians(75.0f), width / (float)height, 0.1f, 100.0f);
 
