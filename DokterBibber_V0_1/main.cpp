@@ -98,6 +98,10 @@ float zPosChange;
 
 float yPos;
 
+int strikout = 0; 
+
+bool gameover = false; 
+
 cv::Mat frame, frameOut, handMask, foreground, fingerCountDebug;
 
 
@@ -280,7 +284,10 @@ int main(void)
                 skinDetector.calibrate(frame);        
                 
         }
-		update();
+		if (!gameover) {
+			update();
+		}
+		
 
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
@@ -324,7 +331,7 @@ void init()
     {
         if (key == GLFW_KEY_ESCAPE)
             glfwSetWindowShouldClose(window, true);
-        if (key == GLFW_KEY_HOME)
+        if (key == GLFW_KEY_Q)
         {
             GameObject* pincetObj = (*g_ptrMainScene->GetRootObject())["Pincet"];
             pincetObj->SetPosition(glm::vec3(0, 3, 0));
@@ -353,6 +360,9 @@ void init()
         {
             yPos-=0.1; // decr. yPos
         }
+		if (key == GLFW_KEY_ENTER && gameover) {
+			std::exit(42); 
+		}
 
         if (key == GLFW_KEY_1)
         {
@@ -549,9 +559,14 @@ void update()
     if (toFollow != NULL) {
         camera->update(window, *toFollow);
     }
+
+	if (strikout > 2) {
+		gameover = true; 
+	}
 }
 
 static bool wireframe_enabled = false;
+bool hasstrike = true; 
 void draw()
 {
     int width, height;
@@ -589,11 +604,27 @@ void draw()
 
     textWriter->setScale(1.4f);
     textWriter->drawText(buffer.str(), 0, -800);   
+	textWriter->drawText(std::to_string(strikout), 0, -700); 
+
+	if (gameover) {
+		textWriter->setScale(5.0f);
+		textWriter->drawText("GameOver", -100, 0);
+	}
     
     GameObject* pincetObj = (*g_ptrMainScene->GetRootObject())["Pincet"];
     
     glm::vec3 pos = pincetObj->GetPosition();
     std::string coordsXY("X: " + std::to_string((pos.x + xPosChange)) + ", Z: " + std::to_string((pos.z + zPosChange )));
+
+	if (pos.y < 0 && hasstrike) {
+		strikout++;
+		hasstrike = false;
+		engine->play2D("Buzzer.mp3", false);
+	}else if (pos.y > 0) {
+		hasstrike = true; 
+	}
+
+	
 
     // coord text
     textWriter->setScale(1.1f);
