@@ -54,6 +54,8 @@ public:
 	ObjModel(const std::string &filename);
 	~ObjModel(void);
 
+	void setColorModel(ObjModel model);
+
 	void draw();
 
 	static std::vector<tigl::Vertex> load(std::string fpath);

@@ -102,6 +102,8 @@ int strikout = 0;
 
 bool gameover = false; 
 
+glm::vec4 cubeColor = glm::vec4(1,1,1,1);
+
 cv::Mat frame, frameOut, handMask, foreground, fingerCountDebug;
 
 
@@ -124,6 +126,7 @@ void init();
 void update();
 void draw();
 void cubes();
+void nose();
 void ongui();
 
 bool initCam();
@@ -322,7 +325,6 @@ void init()
 	g_ptrMainScene->GetRootObject()->AddChild(GameObject::Instantiate("Pincet"));
     g_ptrMainScene->GetRootObject()->AddChild(GameObject::Instantiate("Bone"));
     g_ptrMainScene->GetRootObject()->AddChild(GameObject::Instantiate("Heart"));
-    ////g_ptrMainScene->GetRootObject()->AddChild(GameObject::Instantiate("Gun"));
     g_ptrMainScene->GetRootObject()->AddChild(GameObject::Instantiate("Circle"));
     g_ptrMainScene->GetRootObject()->AddChild(GameObject::Instantiate("Triangle"));
     g_ptrMainScene->GetRootObject()->AddChild(GameObject::Instantiate("Monkey"));
@@ -420,15 +422,16 @@ void init()
 	/// </summary>
 	
 	GameObject* pinguinObj = (*g_ptrMainScene->GetRootObject())["Pinguin"]; // Verkrijgen van het opgeslagen gameobject
-    MeshComponent* penguinMesh = Component::Instantiate<MeshComponent>(&ObjModel::load("Data/Models/Pinguin/PinguinBibber.obj"));
+    MeshComponent* penguinMesh = Component::Instantiate<MeshComponent>(&ObjModel::load("Data/Models/Pinguin/PingquinBibberV1.obj"));
 	pinguinObj->AddComponent(penguinMesh); // Het Toevoegen van een meshcomponent met data
+    
 
-    //colDectPenguin = Component::Instantiate<CollisionDetectionComponent>(); // Het aanmaken van een collision component
-    //colDectPenguin->initializeCollisionFrame(penguinMesh->GetVertices()); // Het overgeven van de mesh data
-	//pinguinObj->AddComponent(colDectPenguin); // Het toevoegen van de collision component
-
+    colDectPenguin = Component::Instantiate<CollisionDetectionComponent>(); // Het aanmaken van een collision component
+    colDectPenguin->initializeCollisionFrame(penguinMesh->GetVertices()); // Het overgeven van de mesh data
+	pinguinObj->AddComponent(colDectPenguin); // Het toevoegen van de collision component
+   
     GameObject* pincetObj = (*g_ptrMainScene->GetRootObject())["Pincet"]; // Verkrijgen van het opgeslagen gameobject
-    MeshComponent* pincetMesh = Component::Instantiate<MeshComponent>(&ObjModel::load("Data/Models/Pincet/Pincet.obj"));
+    MeshComponent* pincetMesh = Component::Instantiate<MeshComponent>(&ObjModel::load("Data/Models/Pincet/PincetV1.obj"));
     pincetObj->AddComponent(pincetMesh); // Het Toevoegen van een meshcomponent met data
     pincetMesh->GetTransform()->SetScale(glm::vec3(0.01f));
     pincetMesh->GetTransform()->SetRotation(glm::vec3(20,0,-85)); 
@@ -440,59 +443,50 @@ void init()
 
     //Pick-up objecten
 
-    ////Bone
+    //Bone
     GameObject* BoneObj = (*g_ptrMainScene->GetRootObject())["Bone"]; // Verkrijgen van het opgeslagen gameobject
     MeshComponent* BoneMesh = Component::Instantiate<MeshComponent>(&ObjModel::load("Data/Models/Pickup/PingquinBibberBoneobj.obj"));
     BoneObj->AddComponent(BoneMesh); // Het Toevoegen van een meshcomponent met data
 
-    //colDect = Component::Instantiate<CollisionDetectionComponent>(); // Het aanmaken van een collision component
-    //colDect->initializeCollisionFrame(BoneMesh->GetVertices()); // Het overgeven van de mesh data
-    //BoneObj->AddComponent(colDect); // Het toevoegen van de collision component
+    colDect = Component::Instantiate<CollisionDetectionComponent>(); // Het aanmaken van een collision component
+    colDect->initializeCollisionFrame(BoneMesh->GetVertices()); // Het overgeven van de mesh data
+    BoneObj->AddComponent(colDect); // Het toevoegen van de collision component
 
-    ////Heart
+    //Heart
     GameObject* HeartObj = (*g_ptrMainScene->GetRootObject())["Heart"]; // Verkrijgen van het opgeslagen gameobject
     MeshComponent* HeartMesh = Component::Instantiate<MeshComponent>(&ObjModel::load("Data/Models/Pickup/PingquinBibberHeart.obj"));
     HeartObj->AddComponent(HeartMesh); // Het Toevoegen van een meshcomponent met data
 
-    //colDect = Component::Instantiate<CollisionDetectionComponent>(); // Het aanmaken van een collision component
-    //colDect->initializeCollisionFrame(HeartMesh->GetVertices()); // Het overgeven van de mesh data
-    //HeartObj->AddComponent(colDect); // Het toevoegen van de collision component
+    colDect = Component::Instantiate<CollisionDetectionComponent>(); // Het aanmaken van een collision component
+    colDect->initializeCollisionFrame(HeartMesh->GetVertices()); // Het overgeven van de mesh data
+    HeartObj->AddComponent(colDect); // Het toevoegen van de collision component
 
-    ////Circle
+    //Circle
     GameObject* CircleObj = (*g_ptrMainScene->GetRootObject())["Circle"]; // Verkrijgen van het opgeslagen gameobject
     MeshComponent* CircleMesh = Component::Instantiate<MeshComponent>(&ObjModel::load("Data/Models/Pickup/PingquinBibberCircle.obj"));
     CircleObj->AddComponent(CircleMesh); // Het Toevoegen van een meshcomponent met data
 
-    //colDect = Component::Instantiate<CollisionDetectionComponent>(); // Het aanmaken van een collision component
-    //colDect->initializeCollisionFrame(CircleMesh->GetVertices()); // Het overgeven van de mesh data
-    //CircleObj->AddComponent(colDect); // Het toevoegen van de collision component
+    colDect = Component::Instantiate<CollisionDetectionComponent>(); // Het aanmaken van een collision component
+    colDect->initializeCollisionFrame(CircleMesh->GetVertices()); // Het overgeven van de mesh data
+    CircleObj->AddComponent(colDect); // Het toevoegen van de collision component
 
-    ////Gun
-    //GameObject* GunObj = (*g_ptrMainScene->GetRootObject())["Gun"]; // Verkrijgen van het opgeslagen gameobject
-    ////MeshComponent* GunMesh = Component::Instantiate<MeshComponent>(&ObjModel::load("Data/Models/Pickup/PingquinBibberGun.obj"));
-    ////GunObj->AddComponent(GunMesh); // Het Toevoegen van een meshcomponent met data
-
-    ///colDect = Component::Instantiate<CollisionDetectionComponent>(); // Het aanmaken van een collision component
-    ////colDect->initializeCollisionFrame(GunMesh->GetVertices()); // Het overgeven van de mesh data
-    ////GunObj->AddComponent(colDect); // Het toevoegen van de collision component
-
-    ////Monkey
+    //Monkey
     GameObject* MonkeyObj = (*g_ptrMainScene->GetRootObject())["Monkey"]; // Verkrijgen van het opgeslagen gameobject
     MeshComponent* MonkeyMesh = Component::Instantiate<MeshComponent>(&ObjModel::load("Data/Models/Pickup/PingquinBibberMonkey.obj"));
     MonkeyObj->AddComponent(MonkeyMesh); // Het Toevoegen van een meshcomponent met data
 
-    //colDect = Component::Instantiate<CollisionDetectionComponent>(); // Het aanmaken van een collision component
-    //colDect->initializeCollisionFrame(MonkeyMesh->GetVertices()); // Het overgeven van de mesh data
-    //MonkeyObj->AddComponent(colDect); // Het toevoegen van de collision component
+    colDect = Component::Instantiate<CollisionDetectionComponent>(); // Het aanmaken van een collision component
+    colDect->initializeCollisionFrame(MonkeyMesh->GetVertices()); // Het overgeven van de mesh data
+    MonkeyObj->AddComponent(colDect); // Het toevoegen van de collision component
 
-    ////triangle
+    //triangle
     GameObject* TriangleObj = (*g_ptrMainScene->GetRootObject())["Triangle"]; // Verkrijgen van het opgeslagen gameobject
     MeshComponent* TriangleMesh = Component::Instantiate<MeshComponent>(&ObjModel::load("Data/Models/Pickup/PingquinBibberTriangle.obj"));
     TriangleObj->AddComponent(TriangleMesh); // Het Toevoegen van een meshcomponent met data
 
-    //colDect = Component::Instantiate<CollisionDetectionComponent>(); // Het aanmaken van een collision component
-    //colDect->initializeCollisionFrame(TriangleMesh->GetVertices()); // Het overgeven van de mesh data
-    //TriangleObj->AddComponent(colDect); // Het toevoegen van de collision component
+    colDect = Component::Instantiate<CollisionDetectionComponent>(); // Het aanmaken van een collision component
+    colDect->initializeCollisionFrame(TriangleMesh->GetVertices()); // Het overgeven van de mesh data
+    TriangleObj->AddComponent(colDect); // Het toevoegen van de collision component
 
     /*std::vector<Vertex> pincetModel = ObjModel::load("C:\\Users\\finni\\Documents\\Programming\\Project-Objects\\PincetV1.obj");
     meshComponentPincet = Component::Instantiate<MeshComponent>(&pincetModel);
@@ -569,6 +563,7 @@ static bool wireframe_enabled = false;
 bool hasstrike = true; 
 void draw()
 {
+    
     int width, height;
     glfwGetWindowSize(window, &width, &height);
 
@@ -613,6 +608,7 @@ void draw()
     
     GameObject* pincetObj = (*g_ptrMainScene->GetRootObject())["Pincet"];
     
+    
     glm::vec3 pos = pincetObj->GetPosition();
     std::string coordsXY("X: " + std::to_string((pos.x + xPosChange)) + ", Z: " + std::to_string((pos.z + zPosChange )));
 
@@ -639,6 +635,8 @@ void draw()
 	/// 3 - Update Pos
 	/// 4 - Set Pos
 	/// </summary>
+
+    
     
     float posX = (pos.x + xPosChange);
     float posZ = (pos.z + zPosChange);
@@ -653,6 +651,8 @@ void draw()
     glm::mat4 projection = glm::perspective(glm::radians(75.0f), width / (float)height, 0.1f, 100.0f);
 
     tigl::shader->setProjectionMatrix(projection);
+
+    
    // tigl::shader->setViewMatrix(view);
 
     if (camera->cameraPincetTrackingOn())
@@ -670,9 +670,11 @@ void draw()
     //glBindTexture(GL_TEXTURE_2D, textureId);
     //showCameraScreen();
     //tigl::shader->enableTexture(false);
+    nose();
 
 	g_ptrMainScene->GetRootObject()->Draw();
 	cubes(); 
+    
 }
 
 void cubes() {  
@@ -684,6 +686,8 @@ void cubes() {
 	tigl::shader->enableAlphaTest(true); 
 
     tigl::begin(GL_QUADS);
+
+
 	
 	//rondje
 	double x = 0;
@@ -741,6 +745,77 @@ void cubes() {
 	tigl::addVertex(Vertex::PC(glm::vec3(-0.5 + x, 1, 1 + z), glm::vec4(5, 1, 5, 0)));
 	tigl::addVertex(Vertex::PC(glm::vec3(1 + x, 1, 1 + z), glm::vec4(5, 1, -5, 0)));
 	tigl::addVertex(Vertex::PC(glm::vec3(1 + x, 1, -0.5 + z), glm::vec4(-5, 1, -5, 0)));
+    tigl::end();
+}
+
+void nose() {
+    //glm::mat4 model = glm::mat4(1.0f);
+    //model = glm::translate(model, glm::vec3(0, 1, -1.5));
+    //model = glm::rotate(model, 0.f, glm::vec3(1, 1, 0));
+
+    tigl::shader->enableColor(true);
+    tigl::shader->enableAlphaTest(false);
+
+    std::vector <tigl::Vertex> vertices;
+
+    float size =  0.5;
+
+    glm::vec3 s(size);
+    glm::vec4 color = cubeColor;
+    glm::vec3 p(0,1,-2);
+
+
+
+    //bottom
+    vertices.push_back(Vertex::PCTN(p + glm::vec3(-s.x, -s.y, -s.z), color, glm::vec2(0, 0), glm::vec3(0, -1, 0)));
+    vertices.push_back(Vertex::PCTN(p + glm::vec3(s.x, -s.y, -s.z), color, glm::vec2(1, 0), glm::vec3(0, -1, 0)));
+    vertices.push_back(Vertex::PCTN(p + glm::vec3(s.x, -s.y, s.z), color, glm::vec2(1, 1), glm::vec3(0, -1, 0)));
+    vertices.push_back(Vertex::PCTN(p + glm::vec3(-s.x, -s.y, s.z), color, glm::vec2(0, 1), glm::vec3(0, -1, 0)));
+
+
+
+    //top
+    vertices.push_back(Vertex::PCTN(p + glm::vec3(-s.x, s.y, -s.z), color, glm::vec2(0, 0), glm::vec3(0, 1, 0)));
+    vertices.push_back(Vertex::PCTN(p + glm::vec3(s.x, s.y, -s.z), color, glm::vec2(1, 0), glm::vec3(0, 1, 0)));
+    vertices.push_back(Vertex::PCTN(p + glm::vec3(s.x, s.y, s.z), color, glm::vec2(1, 1), glm::vec3(0, 1, 0)));
+    vertices.push_back(Vertex::PCTN(p + glm::vec3(-s.x, s.y, s.z), color, glm::vec2(0, 1), glm::vec3(0, 1, 0)));
+
+
+
+    //left
+    vertices.push_back(Vertex::PCTN(p + glm::vec3(s.x, -s.y, -s.z), color, glm::vec2(0, 0), glm::vec3(1, 0, 0)));
+    vertices.push_back(Vertex::PCTN(p + glm::vec3(s.x, s.y, -s.z), color, glm::vec2(1, 0), glm::vec3(1, 0, 0)));
+    vertices.push_back(Vertex::PCTN(p + glm::vec3(s.x, s.y, s.z), color, glm::vec2(1, 1), glm::vec3(1, 0, 0)));
+    vertices.push_back(Vertex::PCTN(p + glm::vec3(s.x, -s.y, s.z), color, glm::vec2(0, 1), glm::vec3(1, 0, 0)));
+
+
+
+    //right
+    vertices.push_back(Vertex::PCTN(p + glm::vec3(-s.x, -s.y, -s.z), color, glm::vec2(0, 0), glm::vec3(-1, 0, 0)));
+    vertices.push_back(Vertex::PCTN(p + glm::vec3(-s.x, s.y, -s.z), color, glm::vec2(1, 0), glm::vec3(-1, 0, 0)));
+    vertices.push_back(Vertex::PCTN(p + glm::vec3(-s.x, s.y, s.z), color, glm::vec2(1, 1), glm::vec3(-1, 0, 0)));
+    vertices.push_back(Vertex::PCTN(p + glm::vec3(-s.x, -s.y, s.z), color, glm::vec2(0, 1), glm::vec3(-1, 0, 0)));
+
+
+
+    //back
+    vertices.push_back(Vertex::PCTN(p + glm::vec3(-s.x, -s.y, -s.z), color, glm::vec2(0, 0), glm::vec3(0, 0, -1)));
+    vertices.push_back(Vertex::PCTN(p + glm::vec3(-s.x, s.y, -s.z), color, glm::vec2(1, 0), glm::vec3(0, 0, -1)));
+    vertices.push_back(Vertex::PCTN(p + glm::vec3(s.x, s.y, -s.z), color, glm::vec2(1, 1), glm::vec3(0, 0, -1)));
+    vertices.push_back(Vertex::PCTN(p + glm::vec3(s.x, -s.y, -s.z), color, glm::vec2(0, 1), glm::vec3(0, 0, -1)));
+
+
+
+    //front
+    vertices.push_back(Vertex::PCTN(p + glm::vec3(-s.x, -s.y, s.z), color, glm::vec2(0, 0), glm::vec3(0, 0, 1)));
+    vertices.push_back(Vertex::PCTN(p + glm::vec3(-s.x, s.y, s.z), color, glm::vec2(1, 0), glm::vec3(0, 0, 1)));
+    vertices.push_back(Vertex::PCTN(p + glm::vec3(s.x, s.y, s.z), color, glm::vec2(1, 1), glm::vec3(0, 0, 1)));
+    vertices.push_back(Vertex::PCTN(p + glm::vec3(s.x, -s.y, s.z), color, glm::vec2(0, 1), glm::vec3(0, 0, 1)));
+
+    
+    tigl::begin(GL_QUADS);
+    tigl::drawVertices(GL_QUADS, vertices);
+
     tigl::end();
 }
 

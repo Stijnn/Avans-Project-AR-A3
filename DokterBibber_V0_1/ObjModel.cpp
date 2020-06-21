@@ -348,6 +348,7 @@ void ObjModel::loadMaterialFile(const std::string &fileName, const std::string &
 
 }
 
+
 ObjModel::MaterialInfo::MaterialInfo()
 {
 	texture = NULL;
