@@ -615,8 +615,10 @@ void draw()
 	if (pos.y < 0 && hasstrike) {
 		strikout++;
 		hasstrike = false;
+        cubeColor = glm::vec4(255,0,0,1);
 		engine->play2D("Buzzer.mp3", false);
 	}else if (pos.y > 0) {
+        cubeColor = glm::vec4(1, 1, 1, 1);
 		hasstrike = true; 
 	}
 
